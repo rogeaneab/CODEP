@@ -1,13 +1,85 @@
 import { courses } from "../data/courses";
 import { getCourseProgress, isCourseUnlocked } from "../lib/progress";
+import { getStoredUser, capitalizeName } from "../lib/user";
 import { Award, BookOpen, Clock, Download, Lock, GraduationCap, CheckCircle2, Code2 } from "lucide-react";
 
 function generateCredentialId(courseId: string) {
   return `CODEP-2026-${courseId.toUpperCase().replace(/-/g, "").slice(0, 8)}`;
 }
 
+// Desenha o certificado num canvas e baixa como PNG — sem backend e sem
+// depender de nenhuma biblioteca nova, só a Canvas API do navegador.
+function downloadCertificate(course: typeof courses[0], studentName: string, credentialId: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1600;
+  canvas.height = 1131;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  // Fundo
+  ctx.fillStyle = "#f8fafc";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Moldura
+  ctx.strokeStyle = "#2563eb";
+  ctx.lineWidth = 10;
+  ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+  ctx.strokeStyle = "#cbd5e1";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(64, 64, canvas.width - 128, canvas.height - 128);
+
+  ctx.textAlign = "center";
+
+  // Logo / marca
+  ctx.fillStyle = "#2563eb";
+  ctx.font = "bold 44px Arial";
+  ctx.fillText("CODEP", canvas.width / 2, 200);
+
+  ctx.fillStyle = "#64748b";
+  ctx.font = "22px Arial";
+  ctx.fillText("Certificado de Conclusão", canvas.width / 2, 250);
+
+  // Nome do aluno
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "bold 56px Arial";
+  ctx.fillText(studentName, canvas.width / 2, 430);
+
+  ctx.strokeStyle = "#e2e8f0";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(canvas.width / 2 - 260, 470);
+  ctx.lineTo(canvas.width / 2 + 260, 470);
+  ctx.stroke();
+
+  ctx.fillStyle = "#475569";
+  ctx.font = "26px Arial";
+  ctx.fillText("concluiu com êxito o curso", canvas.width / 2, 540);
+
+  ctx.fillStyle = "#2563eb";
+  ctx.font = "bold 40px Arial";
+  ctx.fillText(course.title, canvas.width / 2, 600);
+
+  ctx.fillStyle = "#64748b";
+  ctx.font = "22px Arial";
+  ctx.fillText(`${course.category} · ${course.level} · ${course.lessons} aulas · ${course.duration}`, canvas.width / 2, 650);
+
+  const today = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "20px Arial";
+  ctx.fillText(`Emitido em ${today}`, canvas.width / 2, 900);
+  ctx.font = "18px monospace";
+  ctx.fillText(credentialId, canvas.width / 2, 935);
+
+  const link = document.createElement("a");
+  link.download = `certificado-codep-${course.id}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
 function CertificateCard({ course, unlocked, progress }: { course: typeof courses[0]; unlocked: boolean; progress: number }) {
   const credentialId = generateCredentialId(course.id);
+  const user = getStoredUser();
+  const studentName = user.name ? capitalizeName(user.name) : "Aluno CODEP";
 
   if (!unlocked) {
     return (
@@ -76,7 +148,10 @@ function CertificateCard({ course, unlocked, progress }: { course: typeof course
           <span className="flex items-center gap-1"><GraduationCap size={12} />{course.level}</span>
         </div>
 
-        <button className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition text-sm shadow-sm">
+        <button
+          onClick={() => downloadCertificate(course, studentName, credentialId)}
+          className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition text-sm shadow-sm"
+        >
           <Download size={15} />
           Baixar Certificado
         </button>
