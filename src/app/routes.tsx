@@ -1,4 +1,4 @@
-import { createHashRouter } from "react-router";
+import { createHashRouter, Navigate } from "react-router";
 import { Root } from "./components/Root";
 import { Home } from "./components/Home";
 import { Courses } from "./components/Courses";
@@ -12,7 +12,6 @@ import { QuizGame } from "./components/QuizGame";
 import { LandingPage } from "./components/LandingPage";
 import { Challenges } from "./components/Challenges";
 import { Certificates } from "./components/Certificates";
-import { Trails } from "./components/Trails";
 
 export const router = createHashRouter([
   {
@@ -33,7 +32,7 @@ export const router = createHashRouter([
       { path: "courses/:courseId/lessons/:lessonId", Component: Lesson },
       { path: "quizzes", Component: Quizzes },
       { path: "quizzes/:quizId", Component: QuizGame },
-      { path: "trails", Component: Trails },
+      { path: "trails", element: <Navigate to="/app/courses" replace /> },
       { path: "challenges", Component: Challenges },
       { path: "certificates", Component: Certificates },
       { path: "profile", Component: Profile },

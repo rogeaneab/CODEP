@@ -147,7 +147,7 @@ export function CourseDetail() {
                 ))}
               </div>
 
-              {/* After course CTA */}
+              {/* After course info */}
               <div className="p-5 bg-slate-50 border-t border-gray-100">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -155,14 +155,9 @@ export function CourseDetail() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-900 mb-0.5">Teoria e prática juntas</p>
-                    <p className="text-xs text-slate-500 mb-3">
+                    <p className="text-xs text-slate-500">
                       Cada aula já abre com teoria e exercício prático na mesma tela — sem precisar trocar de página.
                     </p>
-                    <Link to="/app/trails"
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                      <Layers size={13} />
-                      Ver roteiro completo nas Trilhas
-                    </Link>
                   </div>
                 </div>
               </div>
@@ -203,11 +198,6 @@ export function CourseDetail() {
                     className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-sm">
                     <Play size={16} />
                     {completedLessons === 0 ? "Começar Curso" : "Continuar Assistindo"}
-                  </Link>
-                  <Link to="/app/trails"
-                    className="w-full mt-2 border border-blue-200 text-blue-600 py-2.5 rounded-xl font-bold hover:bg-blue-50 transition flex items-center justify-center gap-2 text-sm">
-                    <Layers size={14} />
-                    Ver Exercícios nas Trilhas
                   </Link>
                 </>
               ) : (

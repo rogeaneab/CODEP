@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, Navigate } from "react-router";
-import { BookOpen, Home, User, Code2, LogOut, Zap, Menu, X, Target, Award, Layers } from "lucide-react";
+import { BookOpen, Home, User, Code2, LogOut, Zap, Menu, X, Target, Award } from "lucide-react";
 import { useState } from "react";
 import { AppFooter } from "./AppFooter";
 
@@ -21,7 +21,6 @@ export function Root() {
   const navItems = [
     { to: "/app", label: "Início", icon: <Home size={17} />, exact: true },
     { to: "/app/courses", label: "Cursos", icon: <BookOpen size={17} /> },
-    { to: "/app/trails", label: "Trilhas", icon: <Layers size={17} /> },
     { to: "/app/quizzes", label: "Quizzes", icon: <Zap size={17} /> },
     { to: "/app/challenges", label: "Desafios", icon: <Target size={17} /> },
     { to: "/app/certificates", label: "Certificados", icon: <Award size={17} /> },
@@ -31,7 +30,6 @@ export function Root() {
   const bottomNavItems = [
     { to: "/app", label: "Início", icon: <Home size={18} />, exact: true },
     { to: "/app/courses", label: "Cursos", icon: <BookOpen size={18} /> },
-    { to: "/app/trails", label: "Trilhas", icon: <Layers size={18} /> },
     { to: "/app/quizzes", label: "Quizzes", icon: <Zap size={18} /> },
     { to: "/app/challenges", label: "Desafios", icon: <Target size={18} /> },
     { to: "/app/profile", label: "Perfil", icon: <User size={18} /> },
