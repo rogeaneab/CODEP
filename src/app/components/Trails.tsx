@@ -70,9 +70,10 @@ export function Trails() {
   const enrolledIds = new Set(courses.filter(c => c.enrolled).map(c => c.id));
 
   const trail = trails.find(t => t.id === activeTrail)!;
+  // Cursos "em breve" ainda não entram no roteiro de exercícios.
   const trailCourses = trail.courseIds
     .map(id => courses.find(c => c.id === id))
-    .filter(Boolean) as typeof courses;
+    .filter((c): c is typeof courses[number] => !!c && !c.comingSoon);
 
   const totalHours = trailCourses.reduce((acc, c) => acc + parseInt(c.duration), 0);
   const completedCount = trailCourses.filter(c => c.progress === 100).length;
@@ -93,7 +94,7 @@ export function Trails() {
       {/* Trail selector */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         {trails.map(t => {
-          const tCourses = t.courseIds.map(id => courses.find(c => c.id === id)).filter(Boolean) as typeof courses;
+          const tCourses = t.courseIds.map(id => courses.find(c => c.id === id)).filter((c): c is typeof courses[number] => !!c && !c.comingSoon);
           const tCompleted = tCourses.filter(c => c.progress === 100).length;
           const tPct = Math.round((tCompleted / tCourses.length) * 100);
           const isActive = t.id === activeTrail;

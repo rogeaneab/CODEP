@@ -9,6 +9,9 @@ export interface Course {
   category: string;
   enrolled: boolean;
   progress: number;
+  /** Trilha visível na biblioteca, mas ainda travada (conteúdo não revisado
+   * para o nível introdutório). Aparece como "Em breve". */
+  comingSoon?: boolean;
 }
 
 export interface Lesson {
@@ -48,6 +51,7 @@ export const courses: Course[] = [
     category: "React",
     enrolled: false,
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "python-data-science",
@@ -60,6 +64,7 @@ export const courses: Course[] = [
     category: "Python",
     enrolled: false,
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "nodejs-backend",
@@ -72,6 +77,7 @@ export const courses: Course[] = [
     category: "Node.js",
     enrolled: false,
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "css-advanced",
@@ -84,6 +90,7 @@ export const courses: Course[] = [
     category: "CSS",
     enrolled: false,
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "typescript-mastery",
@@ -96,6 +103,7 @@ export const courses: Course[] = [
     category: "TypeScript",
     enrolled: false,
     progress: 0,
+    comingSoon: true,
   },
 ];
 

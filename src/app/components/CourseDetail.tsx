@@ -1,7 +1,7 @@
 import { Link, useParams, useNavigate } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { getCourseById, getLessonsByCourseId } from "../data/courses";
-import { ArrowLeft, BookOpen, Clock, CheckCircle2, Play, GraduationCap, BarChart2, Video, Layers } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, CheckCircle2, Play, GraduationCap, BarChart2, Video, Layers, Lock } from "lucide-react";
 
 export function CourseDetail() {
   const { courseId } = useParams();
@@ -14,6 +14,22 @@ export function CourseDetail() {
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">
       <h2 className="text-2xl font-bold text-slate-900 mb-4">Curso não encontrado</h2>
       <Link to="/app/courses" className="text-blue-600 hover:text-blue-700 font-semibold">Voltar para cursos</Link>
+    </div>
+  );
+
+  if (course.comingSoon) return (
+    <div className="max-w-xl mx-auto px-4 py-20 text-center">
+      <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <Lock className="text-slate-400" size={24} />
+      </div>
+      <h2 className="text-xl font-extrabold text-slate-900 mb-2">{course.title} — em breve</h2>
+      <p className="text-slate-500 text-sm mb-6">
+        Esta trilha ainda está em revisão. Por enquanto, foque em JavaScript para Iniciantes.
+      </p>
+      <Link to="/app/courses/javascript-basics"
+        className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">
+        <Play size={15} />Ir para JavaScript para Iniciantes
+      </Link>
     </div>
   );
 

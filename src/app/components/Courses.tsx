@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { courses } from "../data/courses";
-import { BookOpen, Clock, Search, SlidersHorizontal } from "lucide-react";
+import { BookOpen, Clock, Search, SlidersHorizontal, Lock } from "lucide-react";
 
 export function Courses() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,27 +75,35 @@ export function Courses() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filtered.map(course => (
-          <Link key={course.id} to={`/app/courses/${course.id}`}
-            className="bg-white rounded-xl hover:shadow-md transition-all border border-gray-200 overflow-hidden group flex flex-col">
+        {filtered.map(course => {
+          const card = (
             <div className="relative h-48 overflow-hidden">
               <ImageWithFallback src={getImageUrl(course.id)} alt={course.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                className={`w-full h-full object-cover transition-transform duration-300 ${course.comingSoon ? "grayscale opacity-60" : "group-hover:scale-105"}`} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <div className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full ${levelBadge[course.level] || "bg-slate-100 text-slate-700"}`}>
                 {course.level}
               </div>
-              {course.enrolled && (
+              {course.comingSoon ? (
+                <div className="absolute top-3 right-3 flex items-center gap-1 bg-slate-900/80 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                  <Lock size={11} />Em breve
+                </div>
+              ) : course.enrolled && (
                 <div className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                   {course.progress}%
                 </div>
               )}
             </div>
+          );
+
+          const body = (
             <div className="p-5 flex flex-col flex-1">
               <span className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1">{course.category}</span>
               <h3 className="font-bold text-slate-900 mb-1.5 text-sm line-clamp-2">{course.title}</h3>
               <p className="text-slate-400 text-xs mb-3 line-clamp-2 flex-1">{course.description}</p>
-              {course.enrolled && (
+              {course.comingSoon ? (
+                <p className="text-xs text-slate-400 mb-3 font-medium">Conteúdo em revisão para lançamento futuro</p>
+              ) : course.enrolled && (
                 <div className="mb-3">
                   <div className="w-full bg-slate-100 rounded-full h-1.5">
                     <div className="bg-blue-500 h-1.5 rounded-full"
@@ -109,8 +117,24 @@ export function Courses() {
                 <span className="flex items-center gap-1"><Clock size={12} />{course.duration}</span>
               </div>
             </div>
-          </Link>
-        ))}
+          );
+
+          if (course.comingSoon) {
+            return (
+              <div key={course.id} aria-disabled
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col cursor-not-allowed">
+                {card}{body}
+              </div>
+            );
+          }
+
+          return (
+            <Link key={course.id} to={`/app/courses/${course.id}`}
+              className="bg-white rounded-xl hover:shadow-md transition-all border border-gray-200 overflow-hidden group flex flex-col">
+              {card}{body}
+            </Link>
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
