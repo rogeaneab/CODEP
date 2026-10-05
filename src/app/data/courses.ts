@@ -49,8 +49,8 @@ export const courses: Course[] = [
     title: "Fundamentos da Computação",
     description: "A base de tudo: história da programação, como o computador processa dados e tipos de linguagens.",
     level: "Iniciante",
-    duration: "50 min",
-    lessons: 7,
+    duration: "1 hora",
+    lessons: 9,
     image: "programming laptop code",
     category: "Fundamentos",
     progress: 0,
@@ -122,6 +122,20 @@ export const lessons: Lesson[] = [
     completed: false, type: "theory",
   },
   {
+    id: "fc-ex-1", courseId: "fundamentos-computacao",
+    title: "Exercício: Entrada, Processamento e Saída",
+    description: "Identifique cada etapa do ciclo entrada → processamento → saída numa situação real.",
+    content: `# Entrada, Processamento e Saída\n\nUma calculadora de IMC recebe peso e altura, calcula o resultado e mostra na tela.\n\n## Tarefa\n\nColoque as 3 etapas abaixo na ordem correta do ciclo que você aprendeu na teoria.`,
+    code: "", solution: "",
+    completed: false, type: "practice",
+    exerciseKind: "order",
+    orderSteps: [
+      "A pessoa digita peso e altura",
+      "O programa calcula o IMC",
+      "A tela mostra o resultado do IMC",
+    ],
+  },
+  {
     id: "fc-3", courseId: "fundamentos-computacao",
     title: "Processamento de Dados – Parte 2",
     description: "Como a informação é representada por dentro do computador: bits e bytes.",
@@ -152,6 +166,16 @@ export const lessons: Lesson[] = [
     content: `# Linguagens Interpretadas\n\nUma linguagem **interpretada** é lida e executada linha por linha, em tempo real, por um programa chamado interpretador — sem um passo de compilação separado antes.\n\n## Exemplos\n\nJavaScript, Python, Ruby, PHP.\n\n## Vantagens e desvantagens\n\n- ✅ Mais rápido pra testar — escreveu, já roda\n- ✅ Geralmente mais fácil pra quem está aprendendo\n- ❌ Tende a rodar um pouco mais devagar que uma linguagem compilada\n\nA partir daqui, você vai praticar com **JavaScript** — uma linguagem interpretada, perfeita pra ver resultado na hora.`,
     code: "", solution: "",
     completed: false, type: "theory",
+  },
+  {
+    id: "fc-ex-2", courseId: "fundamentos-computacao",
+    title: "Exercício: Compilada ou Interpretada?",
+    description: "Classifique o JavaScript com base no que você aprendeu nas duas últimas aulas.",
+    content: `# Compilada ou Interpretada?\n\nPense no que você aprendeu sobre linguagens compiladas e interpretadas.\n\n## Tarefa\n\nO JavaScript, a linguagem que você vai usar a partir daqui, é:`,
+    code: "", solution: "",
+    completed: false, type: "practice",
+    exerciseKind: "predict",
+    predict: { options: ["Compilada", "Interpretada", "Nenhuma das duas", "As duas, dependendo do navegador"], correctIndex: 1 },
   },
   {
     id: "fc-7", courseId: "fundamentos-computacao",
@@ -362,17 +386,20 @@ export interface Unit {
   practice?: Lesson;
 }
 
-/** Agrupa a sequência de aulas de um curso em unidades teoria+prática. */
+/** Agrupa a sequência de aulas de um curso em unidades teoria+prática.
+ * Quem decide o "papel" da aula é o campo `type` (teoria abre unidade nova,
+ * prática se junta à teoria anterior) — não a presença de vídeo, já que
+ * teoria sem vídeo (texto puro) também é teoria, não um exercício. */
 export function getCourseUnits(courseId: string): Unit[] {
   const courseLessons = getLessonsByCourseId(courseId);
   const units: Unit[] = [];
   for (const l of courseLessons) {
-    if (l.videoUrl) {
-      units.push({ theory: l });
-    } else {
+    if (l.type === "practice") {
       const last = units[units.length - 1];
       if (last && !last.practice) last.practice = l;
       else units.push({ practice: l });
+    } else {
+      units.push({ theory: l });
     }
   }
   return units;
