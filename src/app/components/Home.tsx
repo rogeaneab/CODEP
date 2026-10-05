@@ -82,22 +82,22 @@ export function Home() {
 
       {/* Nível e XP — ligado a exercícios de fato concluídos/acertados,
           não decorativo. */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
-            <span className="text-lg font-extrabold leading-none">{levelInfo.level}</span>
+      <div className="bg-white rounded-xl border border-gray-200 p-3.5 mb-6 max-w-xl">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+            <span className="text-sm font-extrabold leading-none">{levelInfo.level}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-3 mb-1.5">
-              <p className="text-sm font-bold text-slate-900">
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <p className="text-xs font-bold text-slate-900">
                 Nível {levelInfo.level} <span className="font-medium text-slate-400">· {totalPoints} XP</span>
               </p>
-              <span className="text-xs text-slate-400 font-medium whitespace-nowrap">
+              <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
                 Faltam {levelInfo.xpToNextLevel - levelInfo.xpInLevel} XP para o nível {levelInfo.level + 1}
               </span>
             </div>
-            <div className="w-full bg-slate-100 rounded-full h-2">
-              <div className="bg-blue-600 h-2 rounded-full transition-all" style={{ width: `${levelInfo.pct}%` }} />
+            <div className="w-full bg-slate-100 rounded-full h-1.5">
+              <div className="bg-blue-600 h-1.5 rounded-full transition-all" style={{ width: `${levelInfo.pct}%` }} />
             </div>
           </div>
         </div>
