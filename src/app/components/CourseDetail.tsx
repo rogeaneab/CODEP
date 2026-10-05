@@ -154,14 +154,14 @@ export function CourseDetail() {
                     <Layers size={16} className="text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900 mb-0.5">Pronto para praticar?</p>
+                    <p className="text-sm font-bold text-slate-900 mb-0.5">Teoria e prática juntas</p>
                     <p className="text-xs text-slate-500 mb-3">
-                      Após assistir as aulas, acesse as Trilhas para fazer os exercícios práticos.
+                      Cada aula já abre com teoria e exercício prático na mesma tela — sem precisar trocar de página.
                     </p>
                     <Link to="/app/trails"
                       className="inline-flex items-center gap-2 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                       <Layers size={13} />
-                      Ir para os Exercícios
+                      Ver roteiro completo nas Trilhas
                     </Link>
                   </div>
                 </div>

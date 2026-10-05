@@ -5,10 +5,21 @@ import { X, Heart, Zap, Trophy, RotateCcw, ArrowRight } from "lucide-react";
 
 type Phase = "playing" | "feedback" | "finished" | "gameover";
 
-export function QuizGame() {
-  const { quizId } = useParams();
+interface QuizGameProps {
+  /** Quando usado embutido numa outra tela (ex.: dentro da Lição), em vez
+   * de ler o id da URL. */
+  quizIdProp?: string;
+  /** Remove o layout de tela cheia e troca a navegação de saída por `onExit`. */
+  embedded?: boolean;
+  onExit?: () => void;
+}
+
+export function QuizGame({ quizIdProp, embedded, onExit }: QuizGameProps = {}) {
+  const params = useParams();
   const navigate = useNavigate();
+  const quizId = quizIdProp ?? params.quizId;
   const quiz = getQuizById(quizId || "");
+  const goBack = () => (onExit ? onExit() : navigate("/app/quizzes"));
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -19,7 +30,7 @@ export function QuizGame() {
 
   if (!quiz) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className={`flex items-center justify-center bg-slate-50 ${embedded ? "" : "min-h-screen"}`}>
         <p className="text-slate-400">Quiz não encontrado.</p>
       </div>
     );
@@ -73,7 +84,7 @@ export function QuizGame() {
   /* ── Game Over ── */
   if (phase === "gameover") {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
+      <div className={`bg-slate-50 flex flex-col items-center justify-center px-4 ${embedded ? "py-10" : "min-h-screen"}`}>
         <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center max-w-sm w-full">
           <div className="text-6xl mb-5">💔</div>
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Você perdeu!</h2>
@@ -86,10 +97,10 @@ export function QuizGame() {
             Tentar Novamente
           </button>
           <button
-            onClick={() => navigate("/app/quizzes")}
+            onClick={goBack}
             className="w-full text-slate-500 hover:text-slate-700 font-semibold text-sm py-2"
           >
-            Voltar aos Quizzes
+            {embedded ? "Voltar para a lição" : "Voltar aos Quizzes"}
           </button>
         </div>
       </div>
@@ -102,7 +113,7 @@ export function QuizGame() {
     const perfect = correctCount === quiz.questions.length;
 
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4">
+      <div className={`bg-slate-50 flex flex-col items-center justify-center px-4 ${embedded ? "py-10" : "min-h-screen"}`}>
         <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center max-w-sm w-full">
           <div className="text-6xl mb-4">{perfect ? "🏆" : accuracy >= 60 ? "🎉" : "📚"}</div>
           <h2 className="text-2xl font-extrabold text-slate-900 mb-1">
@@ -135,10 +146,10 @@ export function QuizGame() {
             Jogar Novamente
           </button>
           <button
-            onClick={() => navigate("/app/quizzes")}
+            onClick={goBack}
             className="w-full flex items-center justify-center gap-2 border border-gray-200 bg-white text-slate-700 px-6 py-3 rounded-xl font-bold hover:bg-slate-50 transition"
           >
-            Outros Quizzes
+            {embedded ? "Voltar para a lição" : "Outros Quizzes"}
           </button>
         </div>
       </div>
@@ -150,11 +161,11 @@ export function QuizGame() {
   const feedbackWrong = phase === "feedback" && !isCorrect;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className={`flex flex-col bg-white ${embedded ? "" : "min-h-screen"}`}>
       {/* Top Bar */}
       <div className="flex items-center gap-3 px-4 pt-5 pb-3 border-b border-gray-100">
         <button
-          onClick={() => navigate("/app/quizzes")}
+          onClick={goBack}
           className="text-slate-300 hover:text-slate-500 transition p-1"
         >
           <X size={22} />
