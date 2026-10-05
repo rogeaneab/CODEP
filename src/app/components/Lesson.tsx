@@ -1,12 +1,65 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router";
-import { getLessonById, getCourseById, getCourseUnits } from "../data/courses";
+import { getLessonById, getCourseById, getCourseUnits, type Unit } from "../data/courses";
 import { isLessonComplete, markLessonComplete, POINTS_PER_LESSON_VALUE } from "../lib/progress";
 import { QuizGame } from "./QuizGame";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Layers, Code2, Video,
   RotateCcw, Play, Lightbulb, ChevronRight, Sparkles, Zap,
+  ArrowUp, ArrowDown, ListOrdered, HelpCircle,
 } from "lucide-react";
+
+/** Renderiza o markdown simples usado no content das lições: títulos,
+ * listas, bloco de código (```) e parágrafos. */
+function renderContent(content: string) {
+  const lines = content.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let codeBuffer: string[] | null = null;
+
+  lines.forEach((line, i) => {
+    if (line.startsWith("```")) {
+      if (codeBuffer === null) {
+        codeBuffer = [];
+      } else {
+        nodes.push(
+          <pre key={`code-${i}`} className="bg-slate-900 text-slate-100 p-3 rounded-lg text-xs overflow-x-auto my-3">
+            <code>{codeBuffer.join("\n")}</code>
+          </pre>
+        );
+        codeBuffer = null;
+      }
+      return;
+    }
+    if (codeBuffer !== null) {
+      codeBuffer.push(line);
+      return;
+    }
+    if (line.startsWith("# ")) { nodes.push(<h1 key={i} className="text-xl font-extrabold mb-3">{line.slice(2)}</h1>); return; }
+    if (line.startsWith("## ")) { nodes.push(<h2 key={i} className="text-base font-bold mb-2 mt-5">{line.slice(3)}</h2>); return; }
+    if (line.startsWith("- ")) { nodes.push(<li key={i} className="ml-4 text-sm opacity-80">{line.slice(2)}</li>); return; }
+    if (line.trim() === "") { nodes.push(<br key={i} />); return; }
+    nodes.push(<p key={i} className="text-sm leading-relaxed opacity-80">{line}</p>);
+  });
+
+  return nodes;
+}
+
+function shuffle<T>(arr: T[], seed: string): T[] {
+  // Shuffle determinístico (mesma lição sempre embaralha igual), pra não
+  // reordenar sozinho a cada render.
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  const rand = () => {
+    h = (h * 1103515245 + 12345) >>> 0;
+    return h / 0xffffffff;
+  };
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 // Trilha → quiz de avaliação final, embutido na última unidade do curso.
 const QUIZ_BY_COURSE: Record<string, string> = {
@@ -41,6 +94,9 @@ export function Lesson() {
   const [practiceCompleted, setPracticeCompleted] = useState(false);
   const [practiceJustEarned, setPracticeJustEarned] = useState(false);
   const [showHints, setShowHints] = useState(false);
+  const [orderArrangement, setOrderArrangement] = useState<string[]>([]);
+  const [orderFeedback, setOrderFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [predictSelected, setPredictSelected] = useState<number | null>(null);
 
   useEffect(() => {
     if (!currentUnit) return;
@@ -54,6 +110,9 @@ export function Lesson() {
     setPracticeCompleted(p ? isLessonComplete(p.id) : false);
     setPracticeJustEarned(false);
     setShowHints(false);
+    setOrderArrangement(p?.exerciseKind === "order" && p.orderSteps ? shuffle(p.orderSteps, p.id) : []);
+    setOrderFeedback(null);
+    setPredictSelected(null);
     setActiveTab(lessonId === p?.id ? "practice" : "theory");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unitKey]);
@@ -102,6 +161,39 @@ export function Lesson() {
     const { alreadyDone } = markLessonComplete(theory.id);
     setTheoryWatched(true);
     setTheoryJustEarned(!alreadyDone);
+  };
+
+  const moveOrderItem = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= orderArrangement.length) return;
+    const next = [...orderArrangement];
+    [next[index], next[target]] = [next[target], next[index]];
+    setOrderArrangement(next);
+    setOrderFeedback(null);
+  };
+
+  const checkOrder = () => {
+    if (!practice?.orderSteps) return;
+    const correct = orderArrangement.every((step, i) => step === practice.orderSteps![i]);
+    if (correct) {
+      const { alreadyDone } = markLessonComplete(practice.id);
+      setOrderFeedback("correct");
+      setPracticeCompleted(true);
+      setPracticeJustEarned(!alreadyDone);
+    } else {
+      setOrderFeedback("wrong");
+    }
+  };
+
+  const selectPredict = (idx: number) => {
+    if (practiceCompleted) return;
+    if (!practice?.predict) return;
+    setPredictSelected(idx);
+    if (idx === practice.predict.correctIndex) {
+      const { alreadyDone } = markLessonComplete(practice.id);
+      setPracticeCompleted(true);
+      setPracticeJustEarned(!alreadyDone);
+    }
   };
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
@@ -156,10 +248,16 @@ export function Lesson() {
       {activeTab === "theory" && theory && (
         <div className="bg-slate-950 flex-1">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-            <div className="rounded-2xl overflow-hidden bg-black aspect-video w-full mb-6 shadow-2xl">
-              <iframe src={theory.videoUrl} title={theory.title} className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-            </div>
+            {theory.videoUrl ? (
+              <div className="rounded-2xl overflow-hidden bg-black aspect-video w-full mb-6 shadow-2xl">
+                <iframe src={theory.videoUrl} title={theory.title} className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+              </div>
+            ) : (
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 text-slate-100">
+                {renderContent(theory.content)}
+              </div>
+            )}
 
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 mb-4">
               <div className="flex items-start justify-between gap-4">
@@ -174,7 +272,7 @@ export function Lesson() {
                 {!theoryWatched && (
                   <button onClick={markTheoryWatched}
                     className="flex-shrink-0 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition">
-                    <CheckCircle2 size={15} />Assistida
+                    <CheckCircle2 size={15} />{theory.videoUrl ? "Assistida" : "Li e entendi"}
                   </button>
                 )}
               </div>
@@ -228,35 +326,31 @@ export function Lesson() {
               </span>
             </div>
 
-            <div className="prose max-w-none mb-6">
-              {practice.content.split("\n").map((line, i) => {
-                if (line.startsWith("# ")) return <h1 key={i} className="text-xl font-extrabold mb-3 text-slate-900">{line.slice(2)}</h1>;
-                if (line.startsWith("## ")) return <h2 key={i} className="text-base font-bold mb-2 mt-5 text-slate-900">{line.slice(3)}</h2>;
-                if (line.startsWith("- ")) return <li key={i} className="ml-4 text-slate-500 text-sm">{line.slice(2)}</li>;
-                if (line.trim() === "" || line.startsWith("```")) return <br key={i} />;
-                return <p key={i} className="text-slate-500 text-sm leading-relaxed">{line}</p>;
-              })}
+            <div className="prose max-w-none mb-6 text-slate-900">
+              {renderContent(practice.content)}
             </div>
 
-            <div className="mb-4">
-              <button
-                onClick={() => setShowHints(prev => !prev)}
-                className="flex items-center gap-2 text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-2 rounded-lg transition w-full"
-              >
-                <Lightbulb size={14} className="flex-shrink-0" />
-                <span className="flex-1 text-left">Dicas</span>
-                <ChevronRight size={13} className={`transition-transform ${showHints ? "rotate-90" : ""}`} />
-              </button>
-              {showHints && (
-                <div className="mt-2 bg-amber-50 border border-amber-100 rounded-xl p-4">
-                  <ul className="space-y-1.5 text-xs text-amber-700">
-                    <li>• Leia o enunciado com atenção</li>
-                    <li>• Use console.log() para debugar</li>
-                    <li>• Execute frequentemente para ver o output</li>
-                  </ul>
-                </div>
-              )}
-            </div>
+            {(!practice.exerciseKind || practice.exerciseKind === "code") && (
+              <div className="mb-4">
+                <button
+                  onClick={() => setShowHints(prev => !prev)}
+                  className="flex items-center gap-2 text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-2 rounded-lg transition w-full"
+                >
+                  <Lightbulb size={14} className="flex-shrink-0" />
+                  <span className="flex-1 text-left">Dicas</span>
+                  <ChevronRight size={13} className={`transition-transform ${showHints ? "rotate-90" : ""}`} />
+                </button>
+                {showHints && (
+                  <div className="mt-2 bg-amber-50 border border-amber-100 rounded-xl p-4">
+                    <ul className="space-y-1.5 text-xs text-amber-700">
+                      <li>• Leia o enunciado com atenção</li>
+                      <li>• Use console.log() para debugar</li>
+                      <li>• Execute frequentemente para ver o output</li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
 
             {practiceCompleted && (
               <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
@@ -285,20 +379,23 @@ export function Lesson() {
               </div>
             )}
 
-            {practiceShowSolution ? (
-              <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
-                <p className="text-xs font-bold text-emerald-800 mb-2">Solução</p>
-                <pre className="bg-slate-900 text-slate-100 p-3 rounded-lg text-xs overflow-x-auto"><code>{practice.solution}</code></pre>
-              </div>
-            ) : (
-              <button onClick={() => setPracticeShowSolution(true)}
-                className="text-sm text-blue-600 hover:text-blue-700 font-semibold">
-                Ver solução
-              </button>
+            {(!practice.exerciseKind || practice.exerciseKind === "code") && (
+              practiceShowSolution ? (
+                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+                  <p className="text-xs font-bold text-emerald-800 mb-2">Solução</p>
+                  <pre className="bg-slate-900 text-slate-100 p-3 rounded-lg text-xs overflow-x-auto"><code>{practice.solution}</code></pre>
+                </div>
+              ) : (
+                <button onClick={() => setPracticeShowSolution(true)}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-semibold">
+                  Ver solução
+                </button>
+              )
             )}
           </div>
 
-          {/* Right — code editor */}
+          {/* Right — editor de código (exerciseKind "code"/padrão) */}
+          {(!practice.exerciseKind || practice.exerciseKind === "code") && (
           <div className="bg-slate-950 flex flex-col min-h-[480px] lg:min-h-0">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 flex-shrink-0">
               <div className="flex items-center gap-2">
@@ -336,6 +433,84 @@ export function Lesson() {
               </div>
             )}
           </div>
+          )}
+
+          {/* Right — ordenar passos (exerciseKind "order") */}
+          {practice.exerciseKind === "order" && (
+            <div className="bg-slate-50 flex flex-col min-h-[420px] lg:min-h-0 p-6">
+              <div className="flex items-center gap-2 mb-4 text-slate-500 text-xs font-bold uppercase tracking-wide">
+                <ListOrdered size={14} />Arraste a ordem com as setas
+              </div>
+              <div className="space-y-2 flex-1">
+                {orderArrangement.map((step, i) => (
+                  <div key={step} className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3">
+                    <span className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-extrabold flex items-center justify-center flex-shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-medium text-slate-800">{step}</span>
+                    <div className="flex flex-col gap-0.5 flex-shrink-0">
+                      <button onClick={() => moveOrderItem(i, -1)} disabled={i === 0}
+                        className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 disabled:opacity-30 disabled:hover:bg-transparent transition">
+                        <ArrowUp size={14} />
+                      </button>
+                      <button onClick={() => moveOrderItem(i, 1)} disabled={i === orderArrangement.length - 1}
+                        className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 disabled:opacity-30 disabled:hover:bg-transparent transition">
+                        <ArrowDown size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {orderFeedback === "wrong" && (
+                <p className="text-sm font-semibold text-red-600 mt-4">❌ Ainda não é essa ordem. Tenta de novo.</p>
+              )}
+              {orderFeedback === "correct" && (
+                <p className="text-sm font-semibold text-emerald-600 mt-4">✅ Isso! Ordem certinha.</p>
+              )}
+              {!practiceCompleted && (
+                <button onClick={checkOrder}
+                  className="mt-4 w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+                  <CheckCircle2 size={16} />Verificar ordem
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Right — prever resultado (exerciseKind "predict") */}
+          {practice.exerciseKind === "predict" && practice.predict && (
+            <div className="bg-slate-50 flex flex-col min-h-[320px] lg:min-h-0 p-6">
+              <div className="flex items-center gap-2 mb-4 text-slate-500 text-xs font-bold uppercase tracking-wide">
+                <HelpCircle size={14} />Escolha uma alternativa
+              </div>
+              <div className="space-y-2">
+                {practice.predict.options.map((opt, i) => {
+                  const isCorrectOpt = i === practice.predict!.correctIndex;
+                  const isSelected = predictSelected === i;
+                  let cls = "w-full text-left px-4 py-3 rounded-xl border-2 font-semibold text-sm transition ";
+                  if (predictSelected === null) {
+                    cls += "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50 text-slate-800";
+                  } else if (isCorrectOpt) {
+                    cls += "border-emerald-400 bg-emerald-50 text-emerald-700";
+                  } else if (isSelected) {
+                    cls += "border-red-300 bg-red-50 text-red-600";
+                  } else {
+                    cls += "border-gray-100 bg-white opacity-40 text-slate-800";
+                  }
+                  return (
+                    <button key={i} onClick={() => selectPredict(i)} disabled={practiceCompleted} className={cls}>
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+              {predictSelected !== null && (
+                <p className={`text-sm font-semibold mt-4 ${predictSelected === practice.predict.correctIndex ? "text-emerald-600" : "text-red-600"}`}>
+                  {predictSelected === practice.predict.correctIndex ? "✅ Isso! Era essa." : "❌ Não é essa — olha o pseudocódigo de novo."}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
 

@@ -24,6 +24,14 @@ export interface Lesson {
   completed: boolean;
   type: "theory" | "practice" | "quiz";
   videoUrl?: string;
+  /** Tipo de exercício prático. Padrão "code" (editor com console.log).
+   * "order" = arrastar/ordenar passos de um algoritmo sem código.
+   * "predict" = múltipla escolha prevendo o resultado de um pseudocódigo. */
+  exerciseKind?: "code" | "order" | "predict";
+  /** Pra exerciseKind "order": a ordem correta dos passos (exibidos embaralhados). */
+  orderSteps?: string[];
+  /** Pra exerciseKind "predict": alternativas e qual é a correta. */
+  predict?: { options: string[]; correctIndex: number };
 }
 
 // A ordem deste array é a trilha de evolução do aluno: do básico ao
@@ -36,8 +44,8 @@ export const courses: Course[] = [
     title: "Lógica de Programação com JavaScript",
     description: "Entenda a lógica de programação usando JavaScript, uma das linguagens mais populares do mundo — a base para criar, analisar e resolver problemas computacionais de forma estruturada. Ideal também pra quem trabalha com marketing digital, UX, design ou áreas correlatas e quer entender melhor como a tecnologia funciona.",
     level: "Iniciante",
-    duration: "8 horas",
-    lessons: 10,
+    duration: "9 horas",
+    lessons: 13,
     image: "programming laptop code",
     category: "Lógica de Programação",
     progress: 0,
@@ -119,6 +127,43 @@ const CSS_VIDEO = "https://www.youtube.com/embed/OXGznpKZ_sA";
 const TS_VIDEO = "https://www.youtube.com/embed/30LWjhZzeSQ";
 
 export const lessons: Lesson[] = [
+  // ── LÓGICA SEM CÓDIGO ───────────────────────────────────
+  {
+    id: "logic-1", courseId: "javascript-basics",
+    title: "Lógica sem código: pensando como um programador",
+    description: "Antes de escrever qualquer linha de código, entenda os 3 blocos que formam todo algoritmo.",
+    content: `# Lógica sem código\n\nProgramar não é, no fundo, escrever numa linguagem — é descrever um processo passo a passo, de forma que não deixe dúvida sobre o que fazer. Isso é a **lógica de programação**, e ela existe antes e independente de qualquer linguagem.\n\nTodo algoritmo, não importa a linguagem, é feito de só 3 blocos:\n\n## 1. Sequência\n\nPassos em ordem, um depois do outro. Ex.: uma receita de bolo — você não pode colocar no forno antes de misturar os ingredientes.\n\n## 2. Condição (se... então... senão...)\n\nEscolher um caminho dependendo de uma situação. Ex.: "se estiver chovendo, leve guarda-chuva; senão, não leve."\n\n## 3. Repetição\n\nFazer a mesma coisa várias vezes, até algo acontecer. Ex.: "bata o ovo até ficar homogêneo."\n\nNos próximos exercícios você vai praticar isso sem escrever código nenhum — só organizando e lendo passos, como quem resolve um quebra-cabeça.`,
+    code: "", solution: "",
+    completed: false, type: "theory",
+  },
+  {
+    id: "logic-ex-1", courseId: "javascript-basics",
+    title: "Exercício: Ordene os passos",
+    description: "Coloque em ordem lógica os passos de uma tarefa do dia a dia.",
+    content: `# Ordene os passos\n\nAbaixo estão os passos de "como fazer um miojo", fora de ordem.\n\n## Tarefa\n\nUse as setas pra colocar os passos na sequência lógica correta — a mesma ideia de organizar um algoritmo.`,
+    code: "", solution: "",
+    completed: false, type: "practice",
+    exerciseKind: "order",
+    orderSteps: [
+      "Colocar água numa panela",
+      "Ferver a água",
+      "Colocar o macarrão na água fervendo",
+      "Esperar 3 minutos",
+      "Adicionar o tempero",
+      "Escorrer o excesso de água e servir",
+    ],
+  },
+  {
+    id: "logic-ex-2", courseId: "javascript-basics",
+    title: "Exercício: Preveja o resultado",
+    description: "Leia o algoritmo em pseudocódigo (sem rodar nada) e descubra o que ele vai mostrar.",
+    content: `# Preveja o resultado\n\nLeia o algoritmo abaixo com atenção, sem executar nada — só pensando.\n\n\`\`\`\nseja N = 7\n\nse N for maior que 5:\n    escreva "grande"\nsenão:\n    escreva "pequeno"\n\`\`\`\n\n## Tarefa\n\nO que esse algoritmo vai mostrar na tela?`,
+    code: "", solution: "",
+    completed: false, type: "practice",
+    exerciseKind: "predict",
+    predict: { options: ["grande", "pequeno", "7", "Dá erro"], correctIndex: 0 },
+  },
+
   // ── JAVASCRIPT ──────────────────────────────────────────
   {
     id: "js-1", courseId: "javascript-basics",
