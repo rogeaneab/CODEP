@@ -7,11 +7,10 @@ export interface Course {
   lessons: number;
   image: string;
   category: string;
-  enrolled: boolean;
+  /** Progresso-semente (não usado para exibição — o progresso real vem de
+   * lib/progress.ts/getCourseProgress, calculado a partir do localStorage).
+   * Mantido só por compatibilidade de dados antigos. */
   progress: number;
-  /** Trilha visível na biblioteca, mas ainda travada (conteúdo não revisado
-   * para o nível introdutório). Aparece como "Em breve". */
-  comingSoon?: boolean;
 }
 
 export interface Lesson {
@@ -27,6 +26,10 @@ export interface Lesson {
   videoUrl?: string;
 }
 
+// A ordem deste array é a trilha de evolução do aluno: do básico ao
+// avançado. Cada curso só desbloqueia quando o anterior é 100% concluído
+// (ver isCourseUnlocked em lib/progress.ts) — o primeiro da lista está
+// sempre liberado.
 export const courses: Course[] = [
   {
     id: "javascript-basics",
@@ -37,7 +40,6 @@ export const courses: Course[] = [
     lessons: 10,
     image: "programming laptop code",
     category: "Lógica de Programação",
-    enrolled: true,
     progress: 0,
   },
   {
@@ -49,7 +51,6 @@ export const courses: Course[] = [
     lessons: 2,
     image: "version control collaboration",
     category: "Git e GitHub",
-    enrolled: true,
     progress: 0,
   },
   {
@@ -61,35 +62,7 @@ export const courses: Course[] = [
     lessons: 5,
     image: "web development interface",
     category: "React",
-    enrolled: false,
     progress: 0,
-    comingSoon: true,
-  },
-  {
-    id: "python-data-science",
-    title: "Python para Data Science",
-    description: "A mesma lógica de programação aplicada à análise e visualização de dados com Python.",
-    level: "Intermediário",
-    duration: "15 horas",
-    lessons: 5,
-    image: "data analytics graphs",
-    category: "Python",
-    enrolled: false,
-    progress: 0,
-    comingSoon: true,
-  },
-  {
-    id: "nodejs-backend",
-    title: "Node.js Backend Development",
-    description: "A mesma lógica de programação aplicada à criação de APIs e serviços com Node.js.",
-    level: "Avançado",
-    duration: "20 horas",
-    lessons: 5,
-    image: "server technology code",
-    category: "Node.js",
-    enrolled: false,
-    progress: 0,
-    comingSoon: true,
   },
   {
     id: "css-advanced",
@@ -100,9 +73,29 @@ export const courses: Course[] = [
     lessons: 4,
     image: "design interface creative",
     category: "CSS",
-    enrolled: false,
     progress: 0,
-    comingSoon: true,
+  },
+  {
+    id: "python-data-science",
+    title: "Python para Data Science",
+    description: "A mesma lógica de programação aplicada à análise e visualização de dados com Python.",
+    level: "Intermediário",
+    duration: "15 horas",
+    lessons: 5,
+    image: "data analytics graphs",
+    category: "Python",
+    progress: 0,
+  },
+  {
+    id: "nodejs-backend",
+    title: "Node.js Backend Development",
+    description: "A mesma lógica de programação aplicada à criação de APIs e serviços com Node.js.",
+    level: "Avançado",
+    duration: "20 horas",
+    lessons: 5,
+    image: "server technology code",
+    category: "Node.js",
+    progress: 0,
   },
   {
     id: "typescript-mastery",
@@ -113,9 +106,7 @@ export const courses: Course[] = [
     lessons: 4,
     image: "coding typescript developer",
     category: "TypeScript",
-    enrolled: false,
     progress: 0,
-    comingSoon: true,
   },
 ];
 

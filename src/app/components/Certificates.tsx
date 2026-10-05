@@ -1,5 +1,5 @@
 import { courses } from "../data/courses";
-import { getCourseProgress } from "../lib/progress";
+import { getCourseProgress, isCourseUnlocked } from "../lib/progress";
 import { Award, BookOpen, Clock, Download, Lock, GraduationCap, CheckCircle2, Code2 } from "lucide-react";
 
 function generateCredentialId(courseId: string) {
@@ -86,7 +86,7 @@ function CertificateCard({ course, unlocked, progress }: { course: typeof course
 }
 
 export function Certificates() {
-  const enrolledCourses = courses.filter(c => c.enrolled);
+  const enrolledCourses = courses.filter(c => isCourseUnlocked(c.id));
   const progressByCourse = new Map(enrolledCourses.map(c => [c.id, getCourseProgress(c.id)]));
   const unlockedCerts = enrolledCourses.filter(c => (progressByCourse.get(c.id) ?? 0) >= 100);
   const inProgressCerts = enrolledCourses.filter(c => (progressByCourse.get(c.id) ?? 0) < 100);

@@ -6,7 +6,7 @@ import {
   Code2, BarChart2, Sparkles,
 } from "lucide-react";
 import { courses, getLessonsByCourseId } from "../data/courses";
-import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo } from "../lib/progress";
+import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo, isCourseUnlocked } from "../lib/progress";
 
 const imageMap: Record<string, string> = {
   "javascript-basics": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?w=600&h=360&fit=crop",
@@ -24,7 +24,9 @@ export function Home() {
     ? user.name.charAt(0).toUpperCase() + user.name.slice(1)
     : "Aluno";
 
-  const enrolledCourses = courses.filter(c => c.enrolled);
+  // Cursos liberados até agora na trilha (o resto aparece travado em
+  // /app/courses e vai sendo revelado conforme o aluno evolui).
+  const enrolledCourses = courses.filter(c => isCourseUnlocked(c.id));
   // Progresso real, vindo do que o aluno de fato completou (localStorage),
   // não do valor estático de data/courses.ts.
   const progressByCourse = new Map(enrolledCourses.map(c => [c.id, getCourseProgress(c.id)]));

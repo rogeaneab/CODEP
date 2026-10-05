@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { courses } from "../data/courses";
-import { getCourseProgress } from "../lib/progress";
+import { getCourseProgress, isCourseUnlocked, getPreviousCourse } from "../lib/progress";
 import { BookOpen, Clock, Search, SlidersHorizontal, Lock } from "lucide-react";
 
 export function Courses() {
@@ -78,20 +78,22 @@ export function Courses() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filtered.map(course => {
-          const pct = course.enrolled ? getCourseProgress(course.id) : course.progress;
+          const pct = getCourseProgress(course.id);
+          const unlocked = isCourseUnlocked(course.id);
+          const previousCourse = getPreviousCourse(course.id);
           const card = (
             <div className="relative h-48 overflow-hidden">
               <ImageWithFallback src={getImageUrl(course.id)} alt={course.title}
-                className={`w-full h-full object-cover transition-transform duration-300 ${course.comingSoon ? "grayscale opacity-60" : "group-hover:scale-105"}`} />
+                className={`w-full h-full object-cover transition-transform duration-300 ${!unlocked ? "grayscale opacity-60" : "group-hover:scale-105"}`} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <div className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full ${levelBadge[course.level] || "bg-slate-100 text-slate-700"}`}>
                 {course.level}
               </div>
-              {course.comingSoon ? (
+              {!unlocked ? (
                 <div className="absolute top-3 right-3 flex items-center gap-1 bg-slate-900/80 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                  <Lock size={11} />Em breve
+                  <Lock size={11} />Trancado
                 </div>
-              ) : course.enrolled && (
+              ) : (
                 <div className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                   {pct}%
                 </div>
@@ -104,9 +106,11 @@ export function Courses() {
               <span className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-1">{course.category}</span>
               <h3 className="font-bold text-slate-900 mb-1.5 text-sm line-clamp-2">{course.title}</h3>
               <p className="text-slate-400 text-xs mb-3 line-clamp-2 flex-1">{course.description}</p>
-              {course.comingSoon ? (
-                <p className="text-xs text-slate-400 mb-3 font-medium">Conteúdo em revisão para lançamento futuro</p>
-              ) : course.enrolled && (
+              {!unlocked ? (
+                <p className="text-xs text-slate-400 mb-3 font-medium">
+                  {previousCourse ? `Conclua "${previousCourse.title}" pra liberar` : "Ainda não disponível"}
+                </p>
+              ) : (
                 <div className="mb-3">
                   <div className="w-full bg-slate-100 rounded-full h-1.5">
                     <div className="bg-blue-500 h-1.5 rounded-full"
@@ -122,7 +126,7 @@ export function Courses() {
             </div>
           );
 
-          if (course.comingSoon) {
+          if (!unlocked) {
             return (
               <div key={course.id} aria-disabled
                 className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col cursor-not-allowed">

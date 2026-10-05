@@ -1,7 +1,7 @@
 import { Link, useParams, useNavigate } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { getCourseById, getCourseUnits } from "../data/courses";
-import { isLessonComplete } from "../lib/progress";
+import { isLessonComplete, isCourseUnlocked, getPreviousCourse, getCourseProgress } from "../lib/progress";
 import { ArrowLeft, BookOpen, Clock, CheckCircle2, Play, GraduationCap, BarChart2, Video, Layers, Lock, BookOpenCheck, Code2 } from "lucide-react";
 
 export function CourseDetail() {
@@ -17,19 +17,26 @@ export function CourseDetail() {
     </div>
   );
 
-  if (course.comingSoon) return (
+  const unlocked = isCourseUnlocked(course.id);
+  const previousCourse = getPreviousCourse(course.id);
+
+  if (!unlocked) return (
     <div className="max-w-xl mx-auto px-4 py-20 text-center">
       <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
         <Lock className="text-slate-400" size={24} />
       </div>
-      <h2 className="text-xl font-extrabold text-slate-900 mb-2">{course.title} — em breve</h2>
+      <h2 className="text-xl font-extrabold text-slate-900 mb-2">{course.title} — trancado</h2>
       <p className="text-slate-500 text-sm mb-6">
-        Esta trilha ainda está em revisão. Por enquanto, foque em JavaScript para Iniciantes.
+        {previousCourse
+          ? <>Conclua <strong>{previousCourse.title}</strong> ({getCourseProgress(previousCourse.id)}%) pra liberar essa trilha.</>
+          : "Esta trilha ainda não está disponível."}
       </p>
-      <Link to="/app/courses/javascript-basics"
-        className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">
-        <Play size={15} />Ir para JavaScript para Iniciantes
-      </Link>
+      {previousCourse && (
+        <Link to={`/app/courses/${previousCourse.id}`}
+          className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">
+          <Play size={15} />Ir para {previousCourse.title}
+        </Link>
+      )}
     </div>
   );
 
@@ -201,30 +208,22 @@ export function CourseDetail() {
                 ))}
               </div>
 
-              {course.enrolled ? (
-                <>
-                  {completedUnits > 0 && (
-                    <div className="mb-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-slate-500 font-medium">Seu progresso</span>
-                        <span className="text-sm font-extrabold text-blue-600">{progressPct}%</span>
-                      </div>
-                      <div className="w-full bg-slate-100 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
-                      </div>
-                    </div>
-                  )}
-                  <Link to={nextLesson ? `/app/courses/${course.id}/lessons/${nextLesson.id}` : `/app/courses/${course.id}`}
-                    className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-sm">
-                    <Play size={16} />
-                    {completedUnits === 0 ? "Começar Curso" : "Continuar Assistindo"}
-                  </Link>
-                </>
-              ) : (
-                <button className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-sm">
-                  Inscrever-se no Curso
-                </button>
+              {completedUnits > 0 && (
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-slate-500 font-medium">Seu progresso</span>
+                    <span className="text-sm font-extrabold text-blue-600">{progressPct}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-2">
+                    <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
+                  </div>
+                </div>
               )}
+              <Link to={nextLesson ? `/app/courses/${course.id}/lessons/${nextLesson.id}` : `/app/courses/${course.id}`}
+                className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-sm">
+                <Play size={16} />
+                {completedUnits === 0 ? "Começar Curso" : "Continuar Assistindo"}
+              </Link>
               <p className="text-center text-xs text-slate-400 mt-3">Acesso vitalício ao conteúdo</p>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { courses } from "../data/courses";
-import { getCourseProgress, getTotalPoints } from "../lib/progress";
+import { getCourseProgress, getTotalPoints, isCourseUnlocked } from "../lib/progress";
 import {
   BookOpen, Award, TrendingUp, Clock, Settings, Flame,
   CheckCircle2, Lock, Mail, User, Calendar, ChevronRight,
@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 export function Profile() {
-  const enrolledCourses = courses.filter(c => c.enrolled);
+  const enrolledCourses = courses.filter(c => isCourseUnlocked(c.id));
   const progressByCourse = new Map(enrolledCourses.map(c => [c.id, getCourseProgress(c.id)]));
   const totalLessons = enrolledCourses.reduce((acc, c) => acc + c.lessons, 0);
   const completedLessons = Math.floor(

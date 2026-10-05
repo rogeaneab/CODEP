@@ -2,7 +2,7 @@
 // Substitui os campos estáticos `lesson.completed` / `course.progress`
 // de data/courses.ts, que são só uma semente inicial fictícia.
 
-import { getLessonsByCourseId } from "../data/courses";
+import { getLessonsByCourseId, courses } from "../data/courses";
 
 const STORAGE_KEY = "codep_progress_v1";
 const POINTS_PER_LESSON = 10;
@@ -99,3 +99,22 @@ export function getCourseProgress(courseId: string): number {
 }
 
 export const POINTS_PER_LESSON_VALUE = POINTS_PER_LESSON;
+
+// A posição de um curso em data/courses.ts é a trilha de evolução: do
+// básico ao avançado. Um curso só libera quando o anterior está 100%
+// concluído — o primeiro da lista está sempre liberado.
+export function isCourseUnlocked(courseId: string): boolean {
+  const order = courses.map(c => c.id);
+  const idx = order.indexOf(courseId);
+  if (idx <= 0) return true;
+  const previousCourseId = order[idx - 1];
+  return getCourseProgress(previousCourseId) === 100;
+}
+
+/** Curso anterior na trilha (para mensagens de "conclua X pra liberar"). */
+export function getPreviousCourse(courseId: string) {
+  const order = courses.map(c => c.id);
+  const idx = order.indexOf(courseId);
+  if (idx <= 0) return undefined;
+  return courses.find(c => c.id === order[idx - 1]);
+}
