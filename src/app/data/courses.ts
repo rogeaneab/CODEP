@@ -24,6 +24,8 @@ export interface Lesson {
   videoUrl?: string;
 }
 
+// Trilha usada no teste com estudantes do ensino médio técnico (20/10):
+// mantemos só o curso de nível introdutório visível na biblioteca.
 export const courses: Course[] = [
   {
     id: "javascript-basics",
@@ -31,12 +33,18 @@ export const courses: Course[] = [
     description: "Aprenda os fundamentos da programação JavaScript do zero",
     level: "Iniciante",
     duration: "8 horas",
-    lessons: 5,
+    lessons: 10,
     image: "programming laptop code",
     category: "JavaScript",
     enrolled: true,
-    progress: 45,
+    progress: 0,
   },
+];
+
+// Cursos de nível intermediário/avançado: fora da biblioteca por enquanto
+// (não entram no teste de usabilidade do protótipo). Mantidos aqui para
+// reativar depois, quando o conteúdo deles também for revisado.
+export const upcomingCourses: Course[] = [
   {
     id: "react-fundamentals",
     title: "React Fundamentals",
@@ -46,8 +54,8 @@ export const courses: Course[] = [
     lessons: 5,
     image: "web development interface",
     category: "React",
-    enrolled: true,
-    progress: 20,
+    enrolled: false,
+    progress: 0,
   },
   {
     id: "python-data-science",
@@ -94,8 +102,8 @@ export const courses: Course[] = [
     lessons: 4,
     image: "coding typescript developer",
     category: "TypeScript",
-    enrolled: true,
-    progress: 5,
+    enrolled: false,
+    progress: 0,
   },
 ];
 
@@ -114,7 +122,16 @@ export const lessons: Lesson[] = [
     description: "O que é JavaScript, onde é usado e por que aprender em 2026.",
     content: `# Introdução ao JavaScript\n\nJavaScript é a linguagem da web moderna.\n\n## Por que aprender?\n\n- Roda em todos os navegadores\n- Usado no frontend e backend\n- Grande ecossistema e comunidade`,
     code: "console.log('Olá, mundo!');", solution: "console.log('Olá, mundo!');",
-    completed: true, type: "theory", videoUrl: JS_VIDEO,
+    completed: false, type: "theory", videoUrl: JS_VIDEO,
+  },
+  {
+    id: "js-ex-1", courseId: "javascript-basics",
+    title: "Exercício: Olá Mundo",
+    description: "Exiba sua primeira mensagem no console.",
+    content: `# Olá Mundo\n\nUse \`console.log()\` para exibir uma mensagem.\n\n## Tarefa\n\nExiba a mensagem **"Olá, mundo!"** no console.`,
+    code: "// Escreva seu código aqui\n",
+    solution: `console.log("Olá, mundo!");`,
+    completed: false, type: "practice",
   },
   {
     id: "js-2", courseId: "javascript-basics",
@@ -122,10 +139,37 @@ export const lessons: Lesson[] = [
     description: "let, const, var e os tipos primitivos do JavaScript.",
     content: `# Variáveis\n\nUsamos variáveis para armazenar dados.\n\n## let e const\n\n\`\`\`js\nlet nome = "Maria";\nconst PI = 3.14;\n\`\`\``,
     code: "let nome = 'Maria';\nconsole.log(nome);", solution: "let nome = 'Maria';\nconsole.log(nome);",
-    completed: true, type: "theory", videoUrl: JS_VIDEO,
+    completed: false, type: "theory", videoUrl: JS_VIDEO,
+  },
+  {
+    id: "js-ex-2", courseId: "javascript-basics",
+    title: "Exercício: Calculadora Simples",
+    description: "Crie variáveis e faça operações matemáticas.",
+    content: `# Calculadora\n\n## Tarefa\n\n1. Declare duas variáveis numéricas \`a\` e \`b\`\n2. Calcule a soma, subtração, multiplicação e divisão\n3. Exiba cada resultado no console`,
+    code: "const a = 10;\nconst b = 3;\n\n// Calcule e exiba os resultados\n",
+    solution: `const a = 10;\nconst b = 3;\nconsole.log("Soma:", a + b);\nconsole.log("Subtração:", a - b);\nconsole.log("Multiplicação:", a * b);\nconsole.log("Divisão:", a / b);`,
+    completed: false, type: "practice",
   },
   {
     id: "js-3", courseId: "javascript-basics",
+    title: "Condicionais: if, else e else if",
+    description: "Tome decisões no código comparando valores com if/else.",
+    content: `# Condicionais\n\nCondicionais decidem qual trecho de código roda, a partir de uma comparação.\n\n## if / else if / else\n\n\`\`\`js\nconst idade = 16;\n\nif (idade >= 18) {\n  console.log("Maior de idade");\n} else {\n  console.log("Menor de idade");\n}\n\`\`\`\n\n## Operadores de comparação\n\n- \`===\` igual\n- \`!==\` diferente\n- \`>\`, \`<\`, \`>=\`, \`<=\``,
+    code: "const idade = 16;\n\nif (idade >= 18) {\n  console.log('Maior de idade');\n} else {\n  console.log('Menor de idade');\n}",
+    solution: "const idade = 16;\n\nif (idade >= 18) {\n  console.log('Maior de idade');\n} else {\n  console.log('Menor de idade');\n}",
+    completed: false, type: "theory", videoUrl: JS_VIDEO,
+  },
+  {
+    id: "js-ex-3", courseId: "javascript-basics",
+    title: "Exercício: Verificador de Idade",
+    description: "Use condicionais para classificar uma idade.",
+    content: `# Verificador de Idade\n\n## Tarefa\n\nDada uma variável \`idade\`, exiba:\n- "Menor de idade" se menor que 18\n- "Maior de idade" se 18 ou mais\n- "Idoso" se 60 ou mais`,
+    code: "const idade = 25;\n\n// Escreva sua lógica aqui\n",
+    solution: `const idade = 25;\nif (idade >= 60) {\n  console.log("Idoso");\n} else if (idade >= 18) {\n  console.log("Maior de idade");\n} else {\n  console.log("Menor de idade");\n}`,
+    completed: false, type: "practice",
+  },
+  {
+    id: "js-4", courseId: "javascript-basics",
     title: "Funções e Escopo",
     description: "Como declarar funções, arrow functions e entender escopo.",
     content: `# Funções\n\nFunções são blocos de código reutilizáveis.\n\n## Arrow Function\n\n\`\`\`js\nconst somar = (a, b) => a + b;\n\`\`\``,
@@ -133,7 +177,16 @@ export const lessons: Lesson[] = [
     completed: false, type: "theory", videoUrl: JS_VIDEO,
   },
   {
-    id: "js-4", courseId: "javascript-basics",
+    id: "js-ex-4", courseId: "javascript-basics",
+    title: "Exercício: Função de Saudação",
+    description: "Crie uma função que recebe um nome e retorna uma saudação.",
+    content: `# Função de Saudação\n\n## Tarefa\n\nCrie uma função \`saudar(nome)\` que retorna a string \`"Olá, [nome]!"\` e exiba o resultado no console.`,
+    code: "// Crie a função saudar aqui\n\nconsole.log(saudar('Maria'));",
+    solution: `function saudar(nome) {\n  return "Olá, " + nome + "!";\n}\nconsole.log(saudar('Maria'));`,
+    completed: false, type: "practice",
+  },
+  {
+    id: "js-5", courseId: "javascript-basics",
     title: "Arrays e Objetos",
     description: "Estruturas de dados fundamentais: arrays e objetos literais.",
     content: `# Arrays e Objetos\n\n## Array\n\n\`\`\`js\nconst frutas = ['maçã', 'banana'];\n\`\`\`\n\n## Objeto\n\n\`\`\`js\nconst pessoa = { nome: 'Ana', idade: 25 };\n\`\`\``,
@@ -141,7 +194,7 @@ export const lessons: Lesson[] = [
     completed: false, type: "theory", videoUrl: JS_VIDEO,
   },
   {
-    id: "js-5", courseId: "javascript-basics",
+    id: "js-6", courseId: "javascript-basics",
     title: "DOM e Eventos",
     description: "Manipule elementos HTML com JavaScript e responda a eventos.",
     content: `# DOM\n\nO Document Object Model representa a página como uma árvore.\n\n\`\`\`js\ndocument.getElementById('btn').addEventListener('click', () => {\n  alert('Clicou!');\n});\n\`\`\``,
@@ -341,43 +394,6 @@ export const lessons: Lesson[] = [
     content: `# TS + React\n\n\`\`\`tsx\ninterface Props {\n  title: string;\n}\nfunction Card({ title }: Props) {\n  return <h1>{title}</h1>;\n}\n\`\`\``,
     code: "// interface Props { title: string; }", solution: "",
     completed: false, type: "theory", videoUrl: TS_VIDEO,
-  },
-  // ── EXERCÍCIOS JAVASCRIPT ────────────────────────────────
-  {
-    id: "js-ex-1", courseId: "javascript-basics",
-    title: "Exercício: Olá Mundo",
-    description: "Exiba sua primeira mensagem no console.",
-    content: `# Olá Mundo\n\nUse \`console.log()\` para exibir uma mensagem.\n\n## Tarefa\n\nExiba a mensagem **"Olá, mundo!"** no console.`,
-    code: "// Escreva seu código aqui\n",
-    solution: `console.log("Olá, mundo!");`,
-    completed: false, type: "practice",
-  },
-  {
-    id: "js-ex-2", courseId: "javascript-basics",
-    title: "Exercício: Calculadora Simples",
-    description: "Crie variáveis e faça operações matemáticas.",
-    content: `# Calculadora\n\n## Tarefa\n\n1. Declare duas variáveis numéricas \`a\` e \`b\`\n2. Calcule a soma, subtração, multiplicação e divisão\n3. Exiba cada resultado no console`,
-    code: "const a = 10;\nconst b = 3;\n\n// Calcule e exiba os resultados\n",
-    solution: `const a = 10;\nconst b = 3;\nconsole.log("Soma:", a + b);\nconsole.log("Subtração:", a - b);\nconsole.log("Multiplicação:", a * b);\nconsole.log("Divisão:", a / b);`,
-    completed: false, type: "practice",
-  },
-  {
-    id: "js-ex-3", courseId: "javascript-basics",
-    title: "Exercício: Verificador de Idade",
-    description: "Use condicionais para classificar uma idade.",
-    content: `# Verificador de Idade\n\n## Tarefa\n\nDada uma variável \`idade\`, exiba:\n- "Menor de idade" se menor que 18\n- "Maior de idade" se 18 ou mais\n- "Idoso" se 60 ou mais`,
-    code: "const idade = 25;\n\n// Escreva sua lógica aqui\n",
-    solution: `const idade = 25;\nif (idade >= 60) {\n  console.log("Idoso");\n} else if (idade >= 18) {\n  console.log("Maior de idade");\n} else {\n  console.log("Menor de idade");\n}`,
-    completed: false, type: "practice",
-  },
-  {
-    id: "js-ex-4", courseId: "javascript-basics",
-    title: "Exercício: Função de Saudação",
-    description: "Crie uma função que recebe um nome e retorna uma saudação.",
-    content: `# Função de Saudação\n\n## Tarefa\n\nCrie uma função \`saudar(nome)\` que retorna a string \`"Olá, [nome]!"\` e exiba o resultado no console.`,
-    code: "// Crie a função saudar aqui\n\nconsole.log(saudar('Maria'));",
-    solution: `function saudar(nome) {\n  return "Olá, " + nome + "!";\n}\nconsole.log(saudar('Maria'));`,
-    completed: false, type: "practice",
   },
 
   // ── EXERCÍCIOS REACT ──────────────────────────────────────
