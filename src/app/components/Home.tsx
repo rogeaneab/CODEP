@@ -3,7 +3,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import {
   BookOpen, Zap, Target, Award, Play, ArrowRight,
   CheckCircle2, Clock, TrendingUp, ChevronRight,
-  Code2, BarChart2, Sparkles,
+  Code2, BarChart2,
 } from "lucide-react";
 import { courses, getLessonsByCourseId } from "../data/courses";
 import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo, isCourseUnlocked, getRecentActivity, formatRelativeTime } from "../lib/progress";
@@ -82,23 +82,24 @@ export function Home() {
 
       {/* Nível e XP — ligado a exercícios de fato concluídos/acertados,
           não decorativo. */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-5 mb-6 text-white">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Sparkles size={20} />
+      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
+            <span className="text-lg font-extrabold leading-none">{levelInfo.level}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-3 mb-1.5">
+              <p className="text-sm font-bold text-slate-900">
+                Nível {levelInfo.level} <span className="font-medium text-slate-400">· {totalPoints} XP</span>
+              </p>
+              <span className="text-xs text-slate-400 font-medium whitespace-nowrap">
+                Faltam {levelInfo.xpToNextLevel - levelInfo.xpInLevel} XP para o nível {levelInfo.level + 1}
+              </span>
             </div>
-            <div>
-              <p className="text-xs text-blue-100 font-semibold uppercase tracking-wide">Nível {levelInfo.level}</p>
-              <p className="text-lg font-extrabold leading-tight">{totalPoints} XP</p>
+            <div className="w-full bg-slate-100 rounded-full h-2">
+              <div className="bg-blue-600 h-2 rounded-full transition-all" style={{ width: `${levelInfo.pct}%` }} />
             </div>
           </div>
-          <span className="text-xs text-blue-100 font-medium">
-            {levelInfo.xpInLevel}/{levelInfo.xpToNextLevel} XP pro próximo nível
-          </span>
-        </div>
-        <div className="w-full bg-white/20 rounded-full h-2">
-          <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${levelInfo.pct}%` }} />
         </div>
       </div>
 
