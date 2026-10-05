@@ -24,8 +24,6 @@ export interface Lesson {
   videoUrl?: string;
 }
 
-// Trilha usada no teste com estudantes do ensino médio técnico (20/10):
-// mantemos só o curso de nível introdutório visível na biblioteca.
 export const courses: Course[] = [
   {
     id: "javascript-basics",
@@ -39,12 +37,6 @@ export const courses: Course[] = [
     enrolled: true,
     progress: 0,
   },
-];
-
-// Cursos de nível intermediário/avançado: fora da biblioteca por enquanto
-// (não entram no teste de usabilidade do protótipo). Mantidos aqui para
-// reativar depois, quando o conteúdo deles também for revisado.
-export const upcomingCourses: Course[] = [
   {
     id: "react-fundamentals",
     title: "React Fundamentals",
