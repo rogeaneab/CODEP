@@ -63,7 +63,7 @@ function shuffle<T>(arr: T[], seed: string): T[] {
 
 // Trilha → quiz de avaliação final, embutido na última unidade do curso.
 const QUIZ_BY_COURSE: Record<string, string> = {
-  "javascript-basics": "js-quiz",
+  "programacao-basica": "js-quiz",
 };
 
 type Tab = "theory" | "practice" | "quiz";

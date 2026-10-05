@@ -136,7 +136,7 @@ export function LandingPage() {
             </h1>
 
             <p className="text-slate-500 text-lg mb-8 leading-relaxed">
-              Entenda a lógica de programação com uma das linguagens mais populares do mundo e aprenda a usar o GitHub — a base para criar, analisar e resolver problemas computacionais, mesmo se você vem de marketing digital, UX, design ou áreas correlatas.
+              Do conceito à prática: história da programação, lógica e seus primeiros programas com uma das linguagens mais populares do mundo — a base pra criar, analisar e resolver problemas computacionais, mesmo se você vem de marketing digital, UX, design ou áreas correlatas.
             </p>
 
             <div className="flex flex-wrap gap-3 mb-10">
@@ -179,7 +179,7 @@ export function LandingPage() {
                 />
               </div>
               <div className="absolute -top-3 -right-3 bg-blue-600 text-white px-3 py-1.5 rounded-xl shadow-md text-xs font-bold border-2 border-white">
-                &lt;/&gt; Lógica + GitHub
+                &lt;/&gt; Programação Básica
               </div>
               <div className="absolute -bottom-3 -left-3 bg-white text-slate-800 px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-sm font-bold border border-gray-100">
                 <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
@@ -220,7 +220,7 @@ export function LandingPage() {
               Por que escolher o <span className="text-blue-600">CODEP</span>?
             </h2>
             <p className="text-slate-500 text-base max-w-2xl mx-auto leading-relaxed">
-              A plataforma foi criada para ensinar a lógica de programação de forma estruturada, usando linguagens populares e o GitHub como ferramenta de colaboração. Também ajuda quem atua em marketing digital, UX, design ou áreas correlatas a entender como a área de tecnologia funciona e se comunicar melhor com o time de desenvolvimento.
+              A plataforma foi criada para ensinar programação do zero de forma estruturada: história, lógica e os primeiros programas de verdade. Também ajuda quem atua em marketing digital, UX, design ou áreas correlatas a entender como a área de tecnologia funciona e se comunicar melhor com o time de desenvolvimento.
             </p>
           </div>
 
@@ -261,9 +261,7 @@ export function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {courses.map((course) => {
               const imageMap: Record<string, string> = {
-                "logica-programacao": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&h=360&fit=crop",
-                "javascript-basics": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?w=600&h=360&fit=crop",
-                "git-github": "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&h=360&fit=crop",
+                "programacao-basica": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&h=360&fit=crop",
                 "react-fundamentals": "https://images.unsplash.com/photo-1760548425425-e42e77fa38f1?w=600&h=360&fit=crop",
                 "python-data-science": "https://images.unsplash.com/photo-1738996747326-65b5d7d7fe9b?w=600&h=360&fit=crop",
                 "nodejs-backend": "https://images.unsplash.com/photo-1763128516808-785e80c1dd68?w=600&h=360&fit=crop",
