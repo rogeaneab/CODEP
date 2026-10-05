@@ -2,11 +2,11 @@ import { Link } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import {
   BookOpen, Zap, Target, Award, Play, ArrowRight,
-  CheckCircle2, Clock, Flame, TrendingUp, ChevronRight,
+  CheckCircle2, Clock, TrendingUp, ChevronRight,
   Code2, BarChart2, Sparkles,
 } from "lucide-react";
 import { courses, getLessonsByCourseId } from "../data/courses";
-import { getCourseProgress, isLessonComplete, getTotalPoints } from "../lib/progress";
+import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo } from "../lib/progress";
 
 const imageMap: Record<string, string> = {
   "javascript-basics": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?w=600&h=360&fit=crop",
@@ -36,6 +36,7 @@ export function Home() {
       ? Math.round(enrolledCourses.reduce((acc, c) => acc + (progressByCourse.get(c.id) ?? 0), 0) / enrolledCourses.length)
       : 0;
   const totalPoints = getTotalPoints();
+  const levelInfo = getCurrentLevelInfo();
 
   const nextCourse = enrolledCourses.find(c => {
     const p = progressByCourse.get(c.id) ?? 0;
@@ -67,24 +68,41 @@ export function Home() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-12">
 
       {/* Greeting */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-1">
-          <Flame size={18} className="text-amber-500" />
-          <span className="text-sm font-semibold text-amber-600">7 dias de sequência</span>
-        </div>
+      <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-slate-900">
           Olá, {firstName}! 👋
         </h1>
         <p className="text-slate-500 text-sm mt-1">Aqui está um resumo do seu progresso.</p>
       </div>
 
+      {/* Nível e XP — ligado a exercícios de fato concluídos/acertados,
+          não decorativo. */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-5 mb-6 text-white">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <p className="text-xs text-blue-100 font-semibold uppercase tracking-wide">Nível {levelInfo.level}</p>
+              <p className="text-lg font-extrabold leading-tight">{totalPoints} XP</p>
+            </div>
+          </div>
+          <span className="text-xs text-blue-100 font-medium">
+            {levelInfo.xpInLevel}/{levelInfo.xpToNextLevel} XP pro próximo nível
+          </span>
+        </div>
+        <div className="w-full bg-white/20 rounded-full h-2">
+          <div className="bg-white h-2 rounded-full transition-all" style={{ width: `${levelInfo.pct}%` }} />
+        </div>
+      </div>
+
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {[
           { icon: <BookOpen size={17} />, color: "text-blue-600", bg: "bg-blue-50", label: "Cursos ativos", value: enrolledCourses.length },
           { icon: <CheckCircle2 size={17} />, color: "text-emerald-600", bg: "bg-emerald-50", label: "Aulas concluídas", value: `${completedLessons}/${totalLessons}` },
           { icon: <TrendingUp size={17} />, color: "text-sky-600", bg: "bg-sky-50", label: "Progresso médio", value: `${avgProgress}%` },
-          { icon: <Sparkles size={17} />, color: "text-amber-500", bg: "bg-amber-50", label: "Pontos", value: totalPoints },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-2">

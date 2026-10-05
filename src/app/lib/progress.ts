@@ -54,6 +54,37 @@ export function getTotalPoints(): number {
   return readState().points;
 }
 
+/** Soma XP direto (ex.: resposta certa em quiz), sem depender de uma aula. */
+export function addXp(amount: number): number {
+  const state = readState();
+  state.points += amount;
+  writeState(state);
+  return state.points;
+}
+
+// Sistema de nível: cada nível exige um pouco mais de XP que o anterior,
+// pra dar sensação de progresso sem ficar fácil demais nem impossível.
+const XP_PER_LEVEL = 50;
+
+export interface LevelInfo {
+  level: number;
+  xpInLevel: number;
+  xpToNextLevel: number;
+  pct: number;
+}
+
+/** Calcula nível + progresso dentro do nível a partir do XP total. */
+export function getLevelInfo(xp: number): LevelInfo {
+  const level = Math.floor(xp / XP_PER_LEVEL) + 1;
+  const xpInLevel = xp % XP_PER_LEVEL;
+  const pct = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
+  return { level, xpInLevel, xpToNextLevel: XP_PER_LEVEL, pct };
+}
+
+export function getCurrentLevelInfo(): LevelInfo {
+  return getLevelInfo(getTotalPoints());
+}
+
 export function getCompletedCount(lessonIds: string[]): number {
   const state = readState();
   return lessonIds.filter(id => state.completedLessonIds.includes(id)).length;

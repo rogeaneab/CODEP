@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { getQuizById } from "../data/quizzes";
+import { addXp } from "../lib/progress";
 import { X, Heart, Zap, Trophy, RotateCcw, ArrowRight } from "lucide-react";
 
 type Phase = "playing" | "feedback" | "finished" | "gameover";
@@ -48,8 +49,12 @@ export function QuizGame({ quizIdProp, embedded, onExit }: QuizGameProps = {}) {
   const handleCheck = () => {
     if (selected === null) return;
     if (isCorrect) {
+      const earned = Math.floor(quiz.xpReward / quiz.questions.length);
       setCorrectCount((c) => c + 1);
-      setXp((x) => x + Math.floor(quiz.xpReward / quiz.questions.length));
+      setXp((x) => x + earned);
+      // XP real: só soma no total do aluno quando a resposta está certa,
+      // pra ligar o nível/gamificação a exercícios de fato acertados.
+      addXp(earned);
     } else {
       const newHearts = hearts - 1;
       setHearts(newHearts);
