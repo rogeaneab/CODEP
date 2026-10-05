@@ -1,15 +1,14 @@
 import { Link, useParams, useNavigate } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { getCourseById, getLessonsByCourseId } from "../data/courses";
+import { getCourseById, getCourseUnits } from "../data/courses";
 import { isLessonComplete } from "../lib/progress";
-import { ArrowLeft, BookOpen, Clock, CheckCircle2, Play, GraduationCap, BarChart2, Video, Layers, Lock } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, CheckCircle2, Play, GraduationCap, BarChart2, Video, Layers, Lock, BookOpenCheck, Code2 } from "lucide-react";
 
 export function CourseDetail() {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const course = getCourseById(courseId || "");
-  const allLessons = getLessonsByCourseId(courseId || "");
-  const lessons = allLessons.filter(l => l.videoUrl);
+  const units = getCourseUnits(courseId || "");
 
   if (!course) return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">
@@ -46,8 +45,11 @@ export function CourseDetail() {
     return map[id] || map["javascript-basics"];
   };
 
-  const completedLessons = lessons.filter(l => isLessonComplete(l.id)).length;
-  const progressPct = lessons.length > 0 ? Math.round((completedLessons / lessons.length) * 100) : 0;
+  const isUnitDone = (u: typeof units[number]) =>
+    (!u.theory || isLessonComplete(u.theory.id)) && (!u.practice || isLessonComplete(u.practice.id));
+
+  const completedUnits = units.filter(isUnitDone).length;
+  const progressPct = units.length > 0 ? Math.round((completedUnits / units.length) * 100) : 0;
 
   const levelBadge: Record<string, string> = {
     "Iniciante": "bg-emerald-50 text-emerald-700 border border-emerald-200",
@@ -55,7 +57,13 @@ export function CourseDetail() {
     "Avançado": "bg-red-50 text-red-700 border border-red-200",
   };
 
-  const nextLesson = lessons.find(l => !isLessonComplete(l.id)) || lessons[0];
+  const firstUnpaired = (u: typeof units[number]) =>
+    (u.theory && !isLessonComplete(u.theory.id)) ? u.theory
+    : (u.practice && !isLessonComplete(u.practice.id)) ? u.practice
+    : undefined;
+
+  const nextUnit = units.find(u => !isUnitDone(u)) || units[0];
+  const nextLesson = nextUnit ? (firstUnpaired(nextUnit) || nextUnit.theory || nextUnit.practice) : undefined;
 
   return (
     <div className="pb-20 md:pb-8">
@@ -89,12 +97,12 @@ export function CourseDetail() {
               <div className="p-5 border-b border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Video size={16} className="text-rose-500" />
-                    <h2 className="font-extrabold text-slate-900">Videoaulas</h2>
+                    <Layers size={16} className="text-rose-500" />
+                    <h2 className="font-extrabold text-slate-900">Unidades</h2>
                   </div>
-                  <span className="text-sm text-slate-400 font-medium">{completedLessons}/{lessons.length} assistidas</span>
+                  <span className="text-sm text-slate-400 font-medium">{completedUnits}/{units.length} concluídas</span>
                 </div>
-                {completedLessons > 0 && (
+                {completedUnits > 0 && (
                   <div>
                     <div className="w-full bg-slate-100 rounded-full h-1.5">
                       <div className="bg-blue-500 h-1.5 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
@@ -102,49 +110,60 @@ export function CourseDetail() {
                     <p className="text-xs text-slate-400 mt-1 font-medium">{progressPct}% concluído</p>
                   </div>
                 )}
+                <p className="text-xs text-slate-400 mt-2">
+                  {units.length} {units.length === 1 ? "unidade" : "unidades"} · teoria + prática em cada uma
+                </p>
               </div>
 
-              {/* Lesson items */}
+              {/* Unit items */}
               <div className="divide-y divide-gray-50">
-                {lessons.map((lesson, index) => (
-                  <Link key={lesson.id}
-                    to={`/app/courses/${course.id}/lessons/${lesson.id}`}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition group">
+                {units.map((unit, index) => {
+                  const openId = unit.theory?.id ?? unit.practice?.id ?? "";
+                  const title = unit.theory?.title ?? unit.practice?.title ?? "";
+                  const done = isUnitDone(unit);
+                  const theoryDone = unit.theory ? isLessonComplete(unit.theory.id) : false;
+                  const practiceDone = unit.practice ? isLessonComplete(unit.practice.id) : false;
+                  return (
+                    <Link key={openId}
+                      to={`/app/courses/${course.id}/lessons/${openId}`}
+                      className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition group">
 
-                    {/* Thumbnail with play overlay */}
-                    <div className="relative w-28 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100">
-                      <ImageWithFallback
-                        src={getImageUrl(course.id)}
-                        alt={lesson.title}
-                        className="w-full h-full object-cover opacity-70"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        {isLessonComplete(lesson.id)
-                          ? <CheckCircle2 size={22} className="text-emerald-400 drop-shadow" />
-                          : <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                              <Play size={13} className="text-slate-800 group-hover:text-white ml-0.5" />
-                            </div>
+                      {/* Unit number / status */}
+                      <div className="relative w-12 h-12 rounded-lg flex-shrink-0 bg-slate-100 flex items-center justify-center">
+                        {done
+                          ? <CheckCircle2 size={22} className="text-emerald-500" />
+                          : <span className="text-sm font-extrabold text-slate-400">{index + 1}</span>
                         }
                       </div>
-                      <span className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded font-medium">
-                        {course.duration.replace(' horas', 'h')}
-                      </span>
-                    </div>
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-slate-400 font-medium mb-0.5">Aula {index + 1}</p>
-                      <h3 className="font-semibold text-slate-900 text-sm group-hover:text-blue-600 transition line-clamp-1">
-                        {lesson.title}
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{lesson.description}</p>
-                    </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-slate-400 font-medium mb-0.5">Unidade {index + 1}</p>
+                        <h3 className="font-semibold text-slate-900 text-sm group-hover:text-blue-600 transition line-clamp-1 mb-1.5">
+                          {title}
+                        </h3>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {unit.theory && (
+                            <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                              theoryDone ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-50 text-slate-500 border-slate-200"
+                            }`}>
+                              <BookOpenCheck size={11} /> Teoria {theoryDone && "✓"}
+                            </span>
+                          )}
+                          {unit.practice && (
+                            <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                              practiceDone ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-50 text-slate-500 border-slate-200"
+                            }`}>
+                              <Code2 size={11} /> Prática {practiceDone && "✓"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                    {isLessonComplete(lesson.id) && (
-                      <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
-                    )}
-                  </Link>
-                ))}
+                      <Play size={16} className="text-slate-300 group-hover:text-blue-600 transition flex-shrink-0" />
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* After course info */}
@@ -171,7 +190,7 @@ export function CourseDetail() {
                 {[
                   { icon: <GraduationCap size={15} className="text-blue-600" />, label: "Nível", value: course.level },
                   { icon: <Clock size={15} className="text-sky-600" />, label: "Duração", value: course.duration },
-                  { icon: <Video size={15} className="text-rose-500" />, label: "Videoaulas", value: `${lessons.length} aulas` },
+                  { icon: <Video size={15} className="text-rose-500" />, label: "Unidades", value: `${units.length} unidades` },
                   { icon: <BarChart2 size={15} className="text-amber-500" />, label: "Categoria", value: course.category },
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
@@ -183,7 +202,7 @@ export function CourseDetail() {
 
               {course.enrolled ? (
                 <>
-                  {completedLessons > 0 && (
+                  {completedUnits > 0 && (
                     <div className="mb-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-slate-500 font-medium">Seu progresso</span>
@@ -197,7 +216,7 @@ export function CourseDetail() {
                   <Link to={nextLesson ? `/app/courses/${course.id}/lessons/${nextLesson.id}` : `/app/courses/${course.id}`}
                     className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-sm">
                     <Play size={16} />
-                    {completedLessons === 0 ? "Começar Curso" : "Continuar Assistindo"}
+                    {completedUnits === 0 ? "Começar Curso" : "Continuar Assistindo"}
                   </Link>
                 </>
               ) : (

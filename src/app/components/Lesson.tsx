@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router";
-import { getLessonById, getLessonsByCourseId, getCourseById, type Lesson as LessonType } from "../data/courses";
+import { getLessonById, getCourseById, getCourseUnits } from "../data/courses";
 import { isLessonComplete, markLessonComplete, POINTS_PER_LESSON_VALUE } from "../lib/progress";
 import { QuizGame } from "./QuizGame";
 import {
@@ -13,28 +13,6 @@ const QUIZ_BY_COURSE: Record<string, string> = {
   "javascript-basics": "js-quiz",
 };
 
-interface Unit {
-  theory?: LessonType;
-  practice?: LessonType;
-}
-
-/** Agrupa a sequência de aulas de um curso em unidades teoria+prática,
- * pra teoria, prática e avaliação ficarem na mesma tela em vez de
- * navegar entre páginas separadas. */
-function buildUnits(courseLessons: LessonType[]): Unit[] {
-  const units: Unit[] = [];
-  for (const l of courseLessons) {
-    if (l.videoUrl) {
-      units.push({ theory: l });
-    } else {
-      const last = units[units.length - 1];
-      if (last && !last.practice) last.practice = l;
-      else units.push({ practice: l });
-    }
-  }
-  return units;
-}
-
 type Tab = "theory" | "practice" | "quiz";
 
 export function Lesson() {
@@ -43,8 +21,7 @@ export function Lesson() {
   const lesson = getLessonById(lessonId || "");
   const course = getCourseById(courseId || "");
 
-  const courseLessons = getLessonsByCourseId(courseId || "");
-  const units = buildUnits(courseLessons);
+  const units = getCourseUnits(courseId || "");
   const unitIndex = units.findIndex(u => u.theory?.id === lessonId || u.practice?.id === lessonId);
   const currentUnit = unitIndex >= 0 ? units[unitIndex] : units[0];
   const previousUnit = unitIndex > 0 ? units[unitIndex - 1] : null;

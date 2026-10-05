@@ -508,3 +508,26 @@ export function getLessonsByCourseId(courseId: string): Lesson[] {
 export function getLessonById(lessonId: string): Lesson | undefined {
   return lessons.find(lesson => lesson.id === lessonId);
 }
+
+/** Uma unidade de aprendizado: teoria + prática da mesma lição, exibidas
+ * juntas na mesma tela (ver Lesson.tsx). */
+export interface Unit {
+  theory?: Lesson;
+  practice?: Lesson;
+}
+
+/** Agrupa a sequência de aulas de um curso em unidades teoria+prática. */
+export function getCourseUnits(courseId: string): Unit[] {
+  const courseLessons = getLessonsByCourseId(courseId);
+  const units: Unit[] = [];
+  for (const l of courseLessons) {
+    if (l.videoUrl) {
+      units.push({ theory: l });
+    } else {
+      const last = units[units.length - 1];
+      if (last && !last.practice) last.practice = l;
+      else units.push({ practice: l });
+    }
+  }
+  return units;
+}
