@@ -11,20 +11,22 @@ const MAX_ACTIVITY_ENTRIES = 30;
 
 interface ProgressState {
   completedLessonIds: string[];
+  completedChallengeIds: string[];
   points: number;
 }
 
 function readState(): ProgressState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { completedLessonIds: [], points: 0 };
+    if (!raw) return { completedLessonIds: [], completedChallengeIds: [], points: 0 };
     const parsed = JSON.parse(raw);
     return {
       completedLessonIds: Array.isArray(parsed.completedLessonIds) ? parsed.completedLessonIds : [],
+      completedChallengeIds: Array.isArray(parsed.completedChallengeIds) ? parsed.completedChallengeIds : [],
       points: typeof parsed.points === "number" ? parsed.points : 0,
     };
   } catch {
-    return { completedLessonIds: [], points: 0 };
+    return { completedLessonIds: [], completedChallengeIds: [], points: 0 };
   }
 }
 
@@ -53,6 +55,25 @@ export function markLessonComplete(lessonId: string): { alreadyDone: boolean; po
   if (lesson) {
     logActivity("lesson", `Completou "${lesson.title}"`);
   }
+  return { alreadyDone: false, points: state.points };
+}
+
+export function isChallengeComplete(challengeId: string): boolean {
+  return readState().completedChallengeIds.includes(challengeId);
+}
+
+/** Marca o desafio como resolvido e soma o XP dele (só na primeira vez) —
+ * usa o mesmo XP/nível/atividade recente da Home, em vez de um contador
+ * isolado só na tela de Desafios. */
+export function markChallengeComplete(challengeId: string, title: string, xp: number): { alreadyDone: boolean; points: number } {
+  const state = readState();
+  if (state.completedChallengeIds.includes(challengeId)) {
+    return { alreadyDone: true, points: state.points };
+  }
+  state.completedChallengeIds.push(challengeId);
+  state.points += xp;
+  writeState(state);
+  logActivity("challenge", `Desafio "${title}" resolvido`);
   return { alreadyDone: false, points: state.points };
 }
 
@@ -141,7 +162,7 @@ export function getPreviousCourse(courseId: string) {
 
 export interface ActivityEntry {
   id: string;
-  type: "lesson" | "quiz";
+  type: "lesson" | "quiz" | "challenge";
   text: string;
   timestamp: number;
 }

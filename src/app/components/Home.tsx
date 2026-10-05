@@ -63,7 +63,9 @@ export function Home() {
   const recentActivity = getRecentActivity(4).map(entry => ({
     icon: entry.type === "quiz"
       ? <Zap size={14} className="text-amber-500" />
-      : <CheckCircle2 size={14} className="text-emerald-500" />,
+      : entry.type === "challenge"
+        ? <Target size={14} className="text-blue-500" />
+        : <CheckCircle2 size={14} className="text-emerald-500" />,
     text: entry.text,
     time: formatRelativeTime(entry.timestamp),
   }));

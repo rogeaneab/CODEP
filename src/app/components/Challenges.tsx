@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Trophy, Zap, Clock, Code2, CheckCircle2, Lock, Target, Star, ChevronRight, Flame, ArrowLeft, RotateCcw, Play, Lightbulb, X } from "lucide-react";
+import { Trophy, Zap, Clock, Code2, CheckCircle2, Target, Star, ChevronRight, Flame, ArrowLeft, RotateCcw, Play, Lightbulb, X } from "lucide-react";
+import { isChallengeComplete, markChallengeComplete } from "../lib/progress";
 
 type Difficulty = "Iniciante" | "Intermediário" | "Avançado";
 
@@ -12,7 +13,6 @@ interface Challenge {
   xp: number;
   timeEstimate: string;
   topics: string[];
-  status: "available" | "completed" | "locked";
   weekly?: boolean;
   starterCode: string;
   solution: string;
@@ -30,7 +30,6 @@ const challenges: Challenge[] = [
     xp: 100,
     timeEstimate: "15 min",
     topics: ["loops", "condicionais", "módulo"],
-    status: "available",
     weekly: true,
     starterCode: `// Desafio: FizzBuzz
 // Percorra de 1 a 100 e imprima:
@@ -64,7 +63,6 @@ for (let i = 1; i <= 100; i++) {
     xp: 150,
     timeEstimate: "20 min",
     topics: ["strings", "funções", "arrays"],
-    status: "available",
     starterCode: `// Desafio: Verificador de Palíndromo
 // Retorne true se a string for palíndromo, false caso contrário
 // Ignore espaços e diferença de maiúsculas/minúsculas
@@ -103,7 +101,6 @@ console.log(ehPalindromo("Anilina"));`,
     xp: 120,
     timeEstimate: "20 min",
     topics: ["variáveis", "condicionais", "funções"],
-    status: "completed",
     starterCode: `// Desafio: Calculadora de IMC
 // IMC = peso / (altura * altura)
 // Classificações:
@@ -142,13 +139,12 @@ console.log(calcularIMC(90, 1.70));`,
   {
     id: "todo-list",
     title: "Lista de Tarefas",
-    description: "Crie uma mini aplicação de to-do list com HTML, CSS e JavaScript puro. Deve permitir adicionar, marcar como concluída e remover tarefas.",
-    category: "HTML/CSS/JS",
+    description: "Simule o gerenciador de uma lista de tarefas usando um array de objetos: adicionar, concluir e remover tarefas.",
+    category: "Funções e Arrays",
     difficulty: "Intermediário",
     xp: 250,
     timeEstimate: "45 min",
-    topics: ["DOM", "eventos", "localStorage"],
-    status: "available",
+    topics: ["arrays", "objetos", "funções"],
     starterCode: `// Desafio: Gerenciador de Tarefas
 // Simule o comportamento de um to-do list usando um array
 
@@ -219,13 +215,12 @@ listarTarefas();`,
   {
     id: "prime-numbers",
     title: "Números Primos",
-    description: "Implemente o Crivo de Eratóstenes para encontrar todos os números primos até N. Otimize para trabalhar com N até 1.000.000.",
-    category: "Algoritmos",
-    difficulty: "Intermediário",
+    description: "Desafio extra, além do que os cursos ensinam: implemente o Crivo de Eratóstenes pra encontrar todos os números primos até N.",
+    category: "Algoritmo avançado",
+    difficulty: "Avançado",
     xp: 200,
     timeEstimate: "30 min",
     topics: ["algoritmos", "arrays", "otimização"],
-    status: "available",
     starterCode: `// Desafio: Crivo de Eratóstenes
 // Encontre todos os números primos até N
 
@@ -263,63 +258,6 @@ console.log("Total de primos até 50:", primos.length);`,
     ],
     testDescription: "crivoEratostenes(50) deve retornar [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]",
   },
-  {
-    id: "binary-search",
-    title: "Busca Binária",
-    description: "Implemente o algoritmo de busca binária que encontra a posição de um elemento em um array ordenado com complexidade O(log n).",
-    category: "Algoritmos",
-    difficulty: "Intermediário",
-    xp: 220,
-    timeEstimate: "30 min",
-    topics: ["algoritmos", "recursão", "arrays"],
-    status: "locked",
-    starterCode: `// Desafio: Busca Binária
-function buscaBinaria(arr, alvo) {
-  // seu código aqui
-}`,
-    solution: `function buscaBinaria(arr, alvo) {
-  let inicio = 0, fim = arr.length - 1;
-  while (inicio <= fim) {
-    const meio = Math.floor((inicio + fim) / 2);
-    if (arr[meio] === alvo) return meio;
-    if (arr[meio] < alvo) inicio = meio + 1;
-    else fim = meio - 1;
-  }
-  return -1;
-}`,
-    hints: ["Use dois ponteiros: inicio e fim", "Calcule o meio: Math.floor((inicio + fim) / 2)"],
-    testDescription: "buscaBinaria([1,3,5,7,9], 5) → 2",
-  },
-  {
-    id: "weather-app",
-    title: "App de Clima",
-    description: "Construa uma interface de previsão do tempo consumindo uma API pública. Exiba temperatura, umidade, condição e previsão para 3 dias.",
-    category: "APIs",
-    difficulty: "Avançado",
-    xp: 400,
-    timeEstimate: "90 min",
-    topics: ["fetch", "async/await", "DOM", "APIs"],
-    status: "locked",
-    starterCode: `// Desafio: App de Clima`,
-    solution: "",
-    hints: [],
-    testDescription: "",
-  },
-  {
-    id: "auth-system",
-    title: "Sistema de Autenticação",
-    description: "Implemente um sistema de login e cadastro com validação de formulário, armazenamento em localStorage e proteção de rotas.",
-    category: "HTML/CSS/JS",
-    difficulty: "Avançado",
-    xp: 500,
-    timeEstimate: "2h",
-    topics: ["localStorage", "validação", "eventos", "rotas"],
-    status: "locked",
-    starterCode: `// Desafio: Sistema de Autenticação`,
-    solution: "",
-    hints: [],
-    testDescription: "",
-  },
 ];
 
 const difficultyConfig: Record<Difficulty, { color: string; bg: string; border: string }> = {
@@ -337,7 +275,7 @@ function ChallengePlayer({ challenge, onClose, onComplete }: {
   const [output, setOutput] = useState("");
   const [showSolution, setShowSolution] = useState(false);
   const [showHints, setShowHints] = useState(false);
-  const [solved, setSolved] = useState(challenge.status === "completed");
+  const [solved, setSolved] = useState(isChallengeComplete(challenge.id));
 
   const runCode = () => {
     try {
@@ -364,9 +302,11 @@ function ChallengePlayer({ challenge, onClose, onComplete }: {
       new Function(code)();
       console.log = orig;
       if (logs.length > 0) {
+        const { alreadyDone } = markChallengeComplete(challenge.id, challenge.title, challenge.xp);
         setSolved(true);
         onComplete(challenge.id);
-        setOutput(`✅ Parabéns! Desafio concluído! +${challenge.xp} XP\n\n--- Output ---\n${logs.join("\n")}`);
+        const xpLine = alreadyDone ? "Você já tinha resolvido esse desafio antes." : `+${challenge.xp} XP`;
+        setOutput(`✅ Parabéns! Desafio concluído! ${xpLine}\n\n--- Output ---\n${logs.join("\n")}`);
       } else {
         setOutput("❌ Nenhum output detectado. Certifique-se de usar console.log() para exibir resultados.");
       }
@@ -537,17 +477,14 @@ function ChallengePlayer({ challenge, onClose, onComplete }: {
 export function Challenges() {
   const [filter, setFilter] = useState<"all" | Difficulty>("all");
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
+  // Progresso real (localStorage via lib/progress.ts), não um contador
+  // isolado que reseta ao recarregar a página.
   const [completedIds, setCompletedIds] = useState<Set<string>>(
-    () => new Set(challenges.filter(c => c.status === "completed").map(c => c.id))
+    () => new Set(challenges.filter(c => isChallengeComplete(c.id)).map(c => c.id))
   );
 
   const handleComplete = (id: string) => {
     setCompletedIds(prev => new Set([...prev, id]));
-  };
-
-  const getStatus = (c: Challenge) => {
-    if (completedIds.has(c.id)) return "completed";
-    return c.status;
   };
 
   const filtered = filter === "all" ? challenges : challenges.filter(c => c.difficulty === filter);
@@ -558,7 +495,7 @@ export function Challenges() {
   if (activeChallenge) {
     return (
       <ChallengePlayer
-        challenge={{ ...activeChallenge, status: getStatus(activeChallenge) }}
+        challenge={activeChallenge}
         onClose={() => setActiveChallenge(null)}
         onComplete={handleComplete}
       />
@@ -663,17 +600,13 @@ export function Challenges() {
         {/* Challenges Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map(challenge => {
-            const status = getStatus(challenge);
             const diff = difficultyConfig[challenge.difficulty];
-            const isLocked = status === "locked";
-            const isCompleted = status === "completed";
+            const isCompleted = completedIds.has(challenge.id);
 
             return (
               <div key={challenge.id}
-                className={`bg-white rounded-xl border border-gray-200 p-5 transition ${
-                  isLocked ? "opacity-50" : "hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
-                }`}
-                onClick={() => !isLocked && setActiveChallenge(challenge)}
+                className="bg-white rounded-xl border border-gray-200 p-5 transition hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                onClick={() => setActiveChallenge(challenge)}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -690,7 +623,6 @@ export function Challenges() {
                     )}
                   </div>
                   {isCompleted && <CheckCircle2 className="text-emerald-500 flex-shrink-0" size={20} />}
-                  {isLocked && <Lock className="text-slate-300 flex-shrink-0" size={18} />}
                 </div>
 
                 <h3 className="font-bold text-slate-900 mb-2">{challenge.title}</h3>
@@ -710,24 +642,17 @@ export function Challenges() {
                     <span className="flex items-center gap-1 text-amber-500 font-bold"><Star size={12} />+{challenge.xp} XP</span>
                   </div>
 
-                  {!isLocked && (
-                    <span className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition ${
-                      isCompleted
-                        ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}>
-                      {isCompleted ? (
-                        <><CheckCircle2 size={13} />Refazer</>
-                      ) : (
-                        <>Iniciar<ChevronRight size={13} /></>
-                      )}
-                    </span>
-                  )}
-                  {isLocked && (
-                    <span className="text-xs text-slate-300 font-semibold flex items-center gap-1">
-                      <Lock size={12} />Bloqueado
-                    </span>
-                  )}
+                  <span className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition ${
+                    isCompleted
+                      ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}>
+                    {isCompleted ? (
+                      <><CheckCircle2 size={13} />Refazer</>
+                    ) : (
+                      <>Iniciar<ChevronRight size={13} /></>
+                    )}
+                  </span>
                 </div>
               </div>
             );
