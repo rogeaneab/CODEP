@@ -5,7 +5,7 @@ import {
   CheckCircle2, Clock, Flame, TrendingUp, ChevronRight,
   Code2, BarChart2,
 } from "lucide-react";
-import { courses } from "../data/courses";
+import { courses, getLessonsByCourseId } from "../data/courses";
 
 const imageMap: Record<string, string> = {
   "javascript-basics": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?w=600&h=360&fit=crop",
@@ -33,6 +33,12 @@ export function Home() {
       : 0;
 
   const nextCourse = enrolledCourses.find(c => c.progress < 100 && c.progress > 0) || enrolledCourses[0];
+
+  // Primeira aula não concluída da próxima trilha — usada para levar o
+  // aluno direto pra prática, sem passar pela tela de detalhes do curso.
+  const nextCourseLessons = nextCourse ? getLessonsByCourseId(nextCourse.id) : [];
+  const nextLesson = nextCourseLessons.find(l => !l.completed) || nextCourseLessons[0];
+  const isNewLearner = nextCourse && nextCourse.progress === 0;
 
   const quickActions = [
     { to: "/app/courses", icon: <BookOpen size={20} />, label: "Cursos", desc: "Ver biblioteca", bg: "bg-blue-50", color: "text-blue-600" },
@@ -87,11 +93,13 @@ export function Home() {
         {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
 
-          {/* Continue studying */}
-          {nextCourse && (
+          {/* Continue studying / Start here */}
+          {nextCourse && nextLesson && (
             <div>
-              <h2 className="text-base font-extrabold text-slate-900 mb-3">Continue de onde parou</h2>
-              <Link to={`/app/courses/${nextCourse.id}`}
+              <h2 className="text-base font-extrabold text-slate-900 mb-3">
+                {isNewLearner ? "Comece aqui" : "Continue de onde parou"}
+              </h2>
+              <Link to={`/app/courses/${nextCourse.id}/lessons/${nextLesson.id}`}
                 className="flex gap-4 bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all group">
                 <div className="relative w-36 flex-shrink-0 overflow-hidden">
                   <ImageWithFallback
@@ -103,8 +111,12 @@ export function Home() {
                 <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
                   <div>
                     <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">{nextCourse.category}</span>
-                    <h3 className="font-bold text-slate-900 text-sm mt-0.5 mb-1">{nextCourse.title}</h3>
-                    <p className="text-xs text-slate-400 mb-3">{nextCourse.lessons} aulas · {nextCourse.duration}</p>
+                    <h3 className="font-bold text-slate-900 text-sm mt-0.5 mb-1">
+                      {isNewLearner ? nextLesson.title : nextCourse.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 mb-3">
+                      {isNewLearner ? nextCourse.title : `${nextCourse.lessons} aulas · ${nextCourse.duration}`}
+                    </p>
                     <div className="w-full bg-slate-100 rounded-full h-1.5 mb-1">
                       <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${nextCourse.progress}%` }} />
                     </div>
@@ -113,7 +125,7 @@ export function Home() {
                   <div className="mt-3">
                     <span className="inline-flex items-center gap-1.5 bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
                       <Play size={11} />
-                      Continuar
+                      {isNewLearner ? "Começar agora" : "Continuar"}
                     </span>
                   </div>
                 </div>

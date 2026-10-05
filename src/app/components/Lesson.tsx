@@ -119,6 +119,21 @@ export function Lesson() {
               </div>
             </div>
 
+            {watched && !isLastLesson && nextLesson && (
+              <div className="bg-emerald-600/10 border border-emerald-500/30 rounded-xl p-5 flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 size={18} className="text-emerald-400" />
+                  </div>
+                  <p className="font-bold text-white">Aula concluída! Boa.</p>
+                </div>
+                <Link to={`/app/courses/${courseId}/lessons/${nextLesson.id}`}
+                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition">
+                  Próxima aula<ArrowRight size={15} />
+                </Link>
+              </div>
+            )}
+
             {isLastLesson && (
               <div className="bg-blue-600/10 border border-blue-500/30 rounded-xl p-5">
                 <div className="flex items-start gap-3">
@@ -243,6 +258,21 @@ export function Lesson() {
               </div>
             )}
           </div>
+
+          {isCompleted && (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
+                <p className="text-sm font-bold text-emerald-800">Exercício concluído! Boa.</p>
+              </div>
+              {nextLesson && (
+                <Link to={`/app/courses/${courseId}/lessons/${nextLesson.id}`}
+                  className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition flex-shrink-0">
+                  Próximo exercício<ArrowRight size={13} />
+                </Link>
+              )}
+            </div>
+          )}
 
           {showSolution ? (
             <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
