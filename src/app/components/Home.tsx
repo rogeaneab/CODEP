@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { courses, getLessonsByCourseId } from "../data/courses";
 import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo, isCourseUnlocked, getRecentActivity, formatRelativeTime } from "../lib/progress";
+import { getStoredUser, capitalizeName } from "../lib/user";
 
 const imageMap: Record<string, string> = {
   "fundamentos-computacao": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&h=360&fit=crop",
@@ -17,10 +18,8 @@ const imageMap: Record<string, string> = {
 };
 
 export function Home() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const firstName = user.name
-    ? user.name.charAt(0).toUpperCase() + user.name.slice(1)
-    : "Aluno";
+  const user = getStoredUser();
+  const firstName = user.name ? capitalizeName(user.name).split(" ")[0] : "Aluno";
 
   // Cursos liberados até agora na trilha (o resto aparece travado em
   // /app/courses e vai sendo revelado conforme o aluno evolui).

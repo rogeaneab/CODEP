@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { courses } from "../data/courses";
 import { getCourseProgress, getTotalPoints, isCourseUnlocked } from "../lib/progress";
+import { getStoredUser, capitalizeName, getInitials, formatMemberSince } from "../lib/user";
 import {
   BookOpen, Award, TrendingUp, Clock, Settings, Flame,
   CheckCircle2, Lock, Mail, User, Calendar, ChevronRight,
@@ -18,15 +19,14 @@ export function Profile() {
   const totalHours = enrolledCourses.reduce((acc, c) => acc + parseInt(c.duration), 0);
   const totalPoints = getTotalPoints();
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = getStoredUser();
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState<string>(user.name || "");
   const [nameInput, setNameInput] = useState(user.name || "");
 
-  const name = displayName
-    ? displayName.charAt(0).toUpperCase() + displayName.slice(1)
-    : "Aluno CODEP";
-  const initials = name.substring(0, 2).toUpperCase();
+  const name = displayName ? capitalizeName(displayName) : "Aluno CODEP";
+  const initials = displayName ? getInitials(displayName) : "??";
+  const memberSince = formatMemberSince(user.memberSince);
 
   const saveProfile = () => {
     const newName = nameInput.trim() || displayName;
@@ -93,7 +93,9 @@ export function Profile() {
           ) : (
             <>
               <h1 className="font-extrabold text-slate-900 mb-0.5">{name}</h1>
-              <p className="text-sm text-slate-400 mb-4">Estudante CODEP · Membro desde Março 2026</p>
+              <p className="text-sm text-slate-400 mb-4">
+                Estudante CODEP{memberSince ? ` · Membro desde ${memberSince}` : ""}
+              </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="flex items-center gap-2.5 text-sm text-slate-500">
@@ -112,7 +114,7 @@ export function Profile() {
                   <div className="w-8 h-8 bg-slate-50 border border-gray-200 rounded-lg flex items-center justify-center">
                     <Calendar size={14} className="text-slate-400" />
                   </div>
-                  <span>Março 2026</span>
+                  <span>{memberSince || "—"}</span>
                 </div>
               </div>
             </>

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { Code2, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Code2, Mail, Lock, Eye, EyeOff, ArrowLeft, User } from "lucide-react";
+import { getStoredUser } from "../lib/user";
 
 export function Login() {
   const navigate = useNavigate();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -11,8 +13,16 @@ export function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      localStorage.setItem("user", JSON.stringify({ email, name: email.split("@")[0] }));
+    if (email && password && name.trim()) {
+      // Sem backend, a "conta" é simulada neste navegador — mas o nome é
+      // o que a pessoa realmente digitou, e a data de entrada só é
+      // registrada uma vez (se já existir uma conta com esse e-mail aqui,
+      // mantém a data original em vez de resetar a cada login).
+      const existing = getStoredUser();
+      const memberSince = existing.email === email && existing.memberSince
+        ? existing.memberSince
+        : new Date().toISOString();
+      localStorage.setItem("user", JSON.stringify({ email, name: name.trim(), memberSince }));
       navigate("/app");
     }
   };
@@ -55,6 +65,20 @@ export function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-1.5">Nome completo</label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+                <input
+                  id="name" type="text" value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Seu nome completo"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition"
+                  required
+                />
+              </div>
+            </div>
+
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-1.5">E-mail</label>
               <div className="relative">
@@ -144,7 +168,7 @@ export function Login() {
 
         <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl p-3.5 text-slate-600 text-sm text-center">
           <span className="text-blue-600 font-semibold">Dica: </span>
-          Use qualquer e-mail e senha para acessar a demonstração.
+          Use seu nome, e qualquer e-mail e senha, para acessar a demonstração.
         </div>
       </div>
     </div>

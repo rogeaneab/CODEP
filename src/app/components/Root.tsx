@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation, Navigate } from "react-router";
 import { BookOpen, Home, User, Code2, LogOut, Zap, Menu, X, Target, Award } from "lucide-react";
 import { useState } from "react";
 import { AppFooter } from "./AppFooter";
+import { getStoredUser, capitalizeName } from "../lib/user";
 
 export function Root() {
   const location = useLocation();
@@ -9,6 +10,11 @@ export function Root() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!user) return <Navigate to="/login" replace />;
+
+  const displayName = (() => {
+    const name = getStoredUser().name;
+    return name ? capitalizeName(name).split(" ")[0] : "Aluno";
+  })();
 
   const isActive = (path: string) =>
     location.pathname === path || location.pathname.startsWith(path + "/");
@@ -82,7 +88,7 @@ export function Root() {
             {/* Desktop actions */}
             <div className="hidden lg:flex items-center gap-2">
               <span className="text-sm text-slate-500 font-medium">
-                {JSON.parse(localStorage.getItem("user") || "{}").name || "Aluno"}
+                {displayName}
               </span>
               <button
                 onClick={handleLogout}
