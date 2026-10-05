@@ -6,7 +6,7 @@ import { QuizGame } from "./QuizGame";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Layers, Code2, Video,
   RotateCcw, Play, Lightbulb, ChevronRight, Sparkles, Zap,
-  ArrowUp, ArrowDown, ListOrdered, HelpCircle,
+  ArrowUp, ArrowDown, ListOrdered, HelpCircle, ExternalLink, BookOpen,
 } from "lucide-react";
 
 /** Renderiza o markdown simples usado no content das lições: títulos,
@@ -277,6 +277,20 @@ export function Lesson() {
                 )}
               </div>
             </div>
+
+            {theory.furtherReading && (
+              <a href={theory.furtherReading.url} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-xl p-4 mb-4 transition group">
+                <div className="w-9 h-9 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <BookOpen size={16} className="text-blue-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-slate-500 font-semibold mb-0.5">Quer se aprofundar?</p>
+                  <p className="text-sm text-slate-200 font-semibold truncate group-hover:text-blue-400 transition">{theory.furtherReading.title}</p>
+                </div>
+                <ExternalLink size={15} className="text-slate-500 group-hover:text-blue-400 transition flex-shrink-0" />
+              </a>
+            )}
 
             {theoryWatched && (
               <div className="bg-emerald-600/10 border border-emerald-500/30 rounded-xl p-5 flex items-center justify-between gap-4 flex-wrap">

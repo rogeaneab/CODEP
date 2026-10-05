@@ -36,6 +36,8 @@ export interface Lesson {
   orderSteps?: string[];
   /** Pra exerciseKind "predict": alternativas e qual é a correta. */
   predict?: { options: string[]; correctIndex: number };
+  /** Link opcional pra quem quiser se aprofundar no assunto da teoria. */
+  furtherReading?: { title: string; url: string };
 }
 
 // A ordem deste array é a trilha de evolução do aluno: do básico ao
@@ -112,6 +114,7 @@ export const lessons: Lesson[] = [
     content: `# Conceitos e História\n\nProgramar é dar instruções pra um computador executar. Isso existe desde muito antes dos computadores modernos.\n\n## Um pouco de história\n\n- **Ada Lovelace** (século 19) é considerada a primeira programadora da história — escreveu o primeiro algoritmo pensado pra ser executado por uma máquina.\n- Nos anos 1940, surgiram os primeiros computadores eletrônicos, programados fisicamente com cabos e interruptores.\n- Nas décadas seguintes vieram as linguagens de programação, que trocaram "fiação" por texto — tornando programar muito mais acessível.\n- Hoje existem milhares de linguagens, cada uma criada pra resolver um tipo de problema melhor que as outras.\n\n## Por que isso importa?\n\nEntender que programação é, no fundo, "dar instruções claras pra uma máquina" tira o mistério da coisa — é a mesma ideia desde Ada Lovelace, só que hoje com ferramentas muito mais poderosas.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Quem foi Ada Lovelace", url: "https://www.techtudo.com.br/guia/2023/07/quem-foi-ada-lovelace-veja-historia-da-primeira-programadora-do-mundo-edinfoeletro.ghtml" },
   },
   {
     id: "fc-2", courseId: "fundamentos-computacao",
@@ -120,6 +123,7 @@ export const lessons: Lesson[] = [
     content: `# Processamento de Dados\n\nTodo programa, por mais complexo que pareça, segue o mesmo ciclo básico:\n\n## Entrada → Processamento → Saída\n\n- **Entrada**: dados que o programa recebe (um clique, um texto digitado, um arquivo)\n- **Processamento**: o que o programa faz com esses dados (calcula, organiza, compara)\n- **Saída**: o resultado que o programa devolve (uma tela, um som, um arquivo salvo)\n\n## Exemplo do dia a dia\n\nUma calculadora: você digita dois números (entrada), ela soma (processamento) e mostra o resultado (saída). Todo app, por mais sofisticado, é essa ideia repetida muitas vezes.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Tratamento de dados (Wikipédia)", url: "https://pt.wikipedia.org/wiki/Tratamento_de_dados" },
   },
   {
     id: "fc-ex-1", courseId: "fundamentos-computacao",
@@ -142,6 +146,7 @@ export const lessons: Lesson[] = [
     content: `# Processamento de Dados — Parte 2\n\nPor dentro, um computador só entende duas coisas: **ligado** e **desligado**. Isso é representado como 0 e 1 — o chamado sistema **binário**.\n\n## Bit e Byte\n\n- **Bit**: a menor unidade de informação (0 ou 1)\n- **Byte**: um grupo de 8 bits, suficiente pra representar, por exemplo, uma letra\n\n## Por que isso importa pra quem programa?\n\nVocê não precisa pensar em binário no dia a dia — as linguagens de programação escondem essa parte. Mas é bom saber que, por trás de todo texto, imagem ou vídeo que você vê na tela, existe só uma sequência enorme de 0s e 1s sendo processada muito rápido.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Qual é a diferença entre bit e byte?", url: "https://canaltech.com.br/hardware/diferenca-bit-e-byte/" },
   },
   {
     id: "fc-4", courseId: "fundamentos-computacao",
@@ -150,6 +155,7 @@ export const lessons: Lesson[] = [
     content: `# Tipos de Linguagens\n\nNem toda linguagem de programação é igualmente "próxima" do que o computador entende.\n\n## Baixo nível\n\nMais próxima da máquina (ex.: Assembly). Rápida e eficiente, mas difícil de escrever e ler.\n\n## Alto nível\n\nMais próxima da linguagem humana (ex.: Python, JavaScript, Java). Mais fácil de aprender e escrever — é com essas que a maioria das pessoas começa.\n\nQuanto mais alto o nível, mais a linguagem "traduz" pra gente; quanto mais baixo, mais controle direto sobre a máquina — com mais complexidade.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Linguagem de alto nível vs baixo nível", url: "https://blog.betrybe.com/linguagem-de-programacao/linguagem-alto-e-baixo-nivel/" },
   },
   {
     id: "fc-5", courseId: "fundamentos-computacao",
@@ -158,6 +164,7 @@ export const lessons: Lesson[] = [
     content: `# Linguagens Compiladas\n\nUma linguagem **compilada** passa por um programa (o compilador) que traduz todo o código de uma vez para linguagem de máquina, gerando um arquivo executável, antes de rodar.\n\n## Exemplos\n\nC, C++, Java (parcialmente), Go.\n\n## Vantagens e desvantagens\n\n- ✅ Geralmente roda mais rápido, já que já está traduzido\n- ✅ Erros de sintaxe são pegos antes de rodar\n- ❌ Precisa recompilar toda vez que o código muda, antes de testar`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Linguagens interpretadas x compiladas", url: "https://www.freecodecamp.org/portuguese/news/linguagens-de-programacao-interpretadas-x-compiladas-qual-e-a-diferenca/" },
   },
   {
     id: "fc-6", courseId: "fundamentos-computacao",
@@ -166,6 +173,7 @@ export const lessons: Lesson[] = [
     content: `# Linguagens Interpretadas\n\nUma linguagem **interpretada** é lida e executada linha por linha, em tempo real, por um programa chamado interpretador — sem um passo de compilação separado antes.\n\n## Exemplos\n\nJavaScript, Python, Ruby, PHP.\n\n## Vantagens e desvantagens\n\n- ✅ Mais rápido pra testar — escreveu, já roda\n- ✅ Geralmente mais fácil pra quem está aprendendo\n- ❌ Tende a rodar um pouco mais devagar que uma linguagem compilada\n\nA partir daqui, você vai praticar com **JavaScript** — uma linguagem interpretada, perfeita pra ver resultado na hora.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Linguagens interpretadas x compiladas", url: "https://www.freecodecamp.org/portuguese/news/linguagens-de-programacao-interpretadas-x-compiladas-qual-e-a-diferenca/" },
   },
   {
     id: "fc-ex-2", courseId: "fundamentos-computacao",
@@ -184,6 +192,7 @@ export const lessons: Lesson[] = [
     content: `# Internet e Mobilidade\n\nProgramar hoje não é só sobre um programa rodando sozinho numa máquina — a maior parte do software que usamos se comunica pela internet.\n\n## Cliente e servidor\n\n- **Cliente**: o app ou site que você usa (no navegador ou no celular)\n- **Servidor**: o computador que guarda os dados e responde aos pedidos do cliente\n\nQuando você abre um app e ele mostra suas mensagens, o celular (cliente) pediu essa informação pra um servidor, em algum lugar do mundo, que respondeu.\n\n## Web vs. mobile\n\n- **Site/aplicação web**: roda no navegador, em qualquer dispositivo\n- **App nativo**: instalado no celular (Android/iOS), geralmente com acesso mais direto aos recursos do aparelho (câmera, GPS)`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Modelo cliente-servidor (Wikipédia)", url: "https://pt.wikipedia.org/wiki/Modelo_cliente%E2%80%93servidor" },
   },
   {
     id: "bd-1", courseId: "banco-de-dados",
@@ -192,6 +201,7 @@ export const lessons: Lesson[] = [
     content: `# Banco de Dados\n\nUm programa raramente guarda informação só na memória — ele precisa persistir dados mesmo depois de desligado. É pra isso que existe o **banco de dados**.\n\n## O que é\n\nUm sistema organizado pra guardar, buscar e atualizar informação de forma estruturada e confiável — pense numa versão muito mais poderosa de uma planilha.\n\n## Exemplo\n\nUm app de rede social guarda cada usuário, cada post e cada curtida como registros num banco de dados, pra poder buscar e mostrar tudo isso rapidamente depois.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Banco de Dados: o que é e principais tipos", url: "https://www.alura.com.br/artigos/banco-de-dados" },
   },
   {
     id: "bd-2", courseId: "banco-de-dados",
@@ -200,6 +210,7 @@ export const lessons: Lesson[] = [
     content: `# Banco de Dados — Parte 2\n\nO tipo de banco de dados mais comum é o **relacional**, organizado em tabelas.\n\n## Tabelas, linhas e colunas\n\n- Cada **tabela** guarda um tipo de informação (ex.: "usuários", "pedidos")\n- Cada **linha** é um registro (ex.: um usuário específico)\n- Cada **coluna** é um atributo desse registro (ex.: nome, e-mail)\n\n## Relações\n\nTabelas podem se conectar entre si — por exemplo, a tabela "pedidos" pode referenciar qual usuário fez cada pedido. É daí que vem o nome "relacional".`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Banco de dados relacional: conceitos", url: "https://www.alura.com.br/artigos/banco-dados-relacionais-conceitos-terminologias-ferramentas" },
   },
   {
     id: "log-1", courseId: "logica-programacao",
@@ -208,6 +219,7 @@ export const lessons: Lesson[] = [
     content: `# Lógica de Programação\n\nProgramar não é, no fundo, escrever numa linguagem — é descrever um processo passo a passo, de forma que não deixe dúvida sobre o que fazer. Isso é a **lógica de programação**, e ela existe antes e independente de qualquer linguagem.\n\nTodo algoritmo, não importa a linguagem, é feito de só 3 blocos:\n\n## 1. Sequência\n\nPassos em ordem, um depois do outro. Ex.: uma receita de bolo — você não pode colocar no forno antes de misturar os ingredientes.\n\n## 2. Condição (se... então... senão...)\n\nEscolher um caminho dependendo de uma situação. Ex.: "se estiver chovendo, leve guarda-chuva; senão, não leve."\n\n## 3. Repetição\n\nFazer a mesma coisa várias vezes, até algo acontecer. Ex.: "bata o ovo até ficar homogêneo."\n\nNo próximo exercício você vai praticar isso sem escrever código nenhum — só organizando passos, como quem resolve um quebra-cabeça.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Lógica de programação: o que é", url: "https://www.locaweb.com.br/blog/temas/codigo-aberto/logica-de-programacao-o-que-e/" },
   },
   {
     id: "log-ex-1", courseId: "logica-programacao",
@@ -233,6 +245,7 @@ export const lessons: Lesson[] = [
     content: `# Lógica de Programação — Parte 2\n\nAntes de escrever código numa linguagem real, programadores costumam rascunhar a ideia em **pseudocódigo** — uma descrição em texto simples, sem se preocupar com a sintaxe exata de nenhuma linguagem.\n\n## Exemplo de pseudocódigo\n\n\`\`\`\nseja N = 7\n\nse N for maior que 5:\n    escreva "grande"\nsenão:\n    escreva "pequeno"\n\`\`\`\n\nQualquer programador, de qualquer linguagem, entende esse pseudocódigo. Só depois ele é "traduzido" pra sintaxe de JavaScript, Python, ou qualquer outra linguagem.\n\nNo próximo exercício, você vai ler um pseudocódigo como esse e prever o resultado, sem executar nada — só pensando.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Pseudocódigo (Wikipédia)", url: "https://pt.wikipedia.org/wiki/Pseudoc%C3%B3digo" },
   },
   {
     id: "log-ex-2", courseId: "logica-programacao",
@@ -251,6 +264,7 @@ export const lessons: Lesson[] = [
     content: `# Olá, Mundo!\n\nChegou a hora de sair do papel e escrever código de verdade. A partir de agora você vai praticar com **JavaScript**, uma das linguagens mais populares do mundo.\n\n## console.log()\n\nA forma mais simples de um programa "falar" com você é exibindo uma mensagem. Em JavaScript, isso se faz com \`console.log()\`:\n\n\`\`\`js\nconsole.log("Olá, mundo!");\n\`\`\`\n\nEscrever um programa que só mostra "Olá, mundo!" é uma tradição entre programadores — é o primeiro passo em praticamente qualquer linguagem nova.`,
     code: "console.log('Olá, mundo!');", solution: "console.log('Olá, mundo!');",
     completed: false, type: "theory", videoUrl: JS_VIDEO,
+    furtherReading: { title: "console.log() (MDN)", url: "https://developer.mozilla.org/pt-BR/docs/Web/API/console/log_static" },
   },
   {
     id: "js-ex-1", courseId: "javascript-basics",
@@ -268,6 +282,7 @@ export const lessons: Lesson[] = [
     content: `# Variáveis e Constantes\n\nUsamos variáveis para armazenar dados que o programa vai usar depois.\n\n## let e const\n\n\`\`\`js\nlet nome = "Maria";   // pode mudar depois\nconst PI = 3.14;      // não muda mais\n\`\`\`\n\nUse \`let\` quando o valor pode mudar ao longo do programa, e \`const\` quando ele é fixo. Na dúvida, prefira \`const\` — é mais seguro.`,
     code: "let nome = 'Maria';\nconsole.log(nome);", solution: "let nome = 'Maria';\nconsole.log(nome);",
     completed: false, type: "theory", videoUrl: JS_VIDEO,
+    furtherReading: { title: "let (MDN)", url: "https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Statements/let" },
   },
   {
     id: "js-ex-2", courseId: "javascript-basics",
@@ -285,6 +300,7 @@ export const lessons: Lesson[] = [
     content: `# Laços de Repetição\n\nQuando você precisa repetir uma ação várias vezes, não escreve o código várias vezes — usa um **laço de repetição** (loop).\n\n## for\n\n\`\`\`js\nfor (let i = 1; i <= 5; i++) {\n  console.log(i);\n}\n\`\`\`\n\nIsso imprime 1, 2, 3, 4, 5 — o \`for\` repete o bloco enquanto a condição (\`i <= 5\`) for verdadeira, aumentando \`i\` a cada volta.\n\n## while\n\n\`\`\`js\nlet i = 1;\nwhile (i <= 5) {\n  console.log(i);\n  i++;\n}\n\`\`\`\n\nFaz a mesma coisa, mas verificando a condição antes de cada repetição — útil quando você não sabe de antemão quantas vezes vai repetir.`,
     code: "for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}", solution: "for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}",
     completed: false, type: "theory", videoUrl: JS_VIDEO,
+    furtherReading: { title: "Laços e iterações (MDN)", url: "https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Guide/Loops_and_iteration" },
   },
   {
     id: "js-ex-3", courseId: "javascript-basics",
@@ -303,6 +319,7 @@ export const lessons: Lesson[] = [
     code: "const idade = 16;\n\nif (idade >= 18) {\n  console.log('Maior de idade');\n} else {\n  console.log('Menor de idade');\n}",
     solution: "const idade = 16;\n\nif (idade >= 18) {\n  console.log('Maior de idade');\n} else {\n  console.log('Menor de idade');\n}",
     completed: false, type: "theory", videoUrl: JS_VIDEO,
+    furtherReading: { title: "if...else (MDN)", url: "https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Statements/if...else" },
   },
   {
     id: "js-ex-4", courseId: "javascript-basics",
@@ -320,6 +337,7 @@ export const lessons: Lesson[] = [
     content: `# SQL — MySQL\n\n**SQL** (Structured Query Language) é a linguagem usada pra buscar e manipular dados dentro de um banco de dados relacional, como o **MySQL**.\n\n## A consulta mais comum: SELECT\n\n\`\`\`sql\nSELECT nome, email FROM usuarios WHERE idade >= 18;\n\`\`\`\n\nEssa consulta busca, na tabela \`usuarios\`, o nome e o e-mail de todo mundo com 18 anos ou mais. SQL é declarativo: você descreve **o que** quer, não **como** buscar — quem decide o "como" é o banco de dados.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "SQL Introduction (W3Schools)", url: "https://www.w3schools.com/sql/sql_intro.asp" },
   },
   {
     id: "web-1", courseId: "desenvolvimento-web",
@@ -328,6 +346,7 @@ export const lessons: Lesson[] = [
     content: `# PHP\n\nPHP é uma linguagem interpretada criada especificamente pra web, muito usada no **lado do servidor** — ou seja, roda no servidor antes da página chegar até você.\n\n## Onde é usado\n\nPHP move uma parte enorme da web — inclusive o WordPress, que sozinho é usado em mais de 40% dos sites do mundo, é escrito em PHP.\n\n## Exemplo\n\n\`\`\`php\n<?php\n  echo "Olá, mundo!";\n?>\n\`\`\`\n\nRepare na semelhança com o "Olá, mundo!" que você já fez em JavaScript — a ideia de exibir uma mensagem se repete em praticamente toda linguagem.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "O que é PHP e para que serve?", url: "https://www.locaweb.com.br/blog/temas/codigo-aberto/php/" },
   },
   {
     id: "web-2", courseId: "desenvolvimento-web",
@@ -336,6 +355,7 @@ export const lessons: Lesson[] = [
     content: `# Frameworks\n\nUm **framework** é um conjunto de ferramentas e regras prontas que ajuda a construir um programa mais rápido, sem reinventar tudo do zero.\n\n## Alguns exemplos conhecidos\n\n- **React** — interfaces web (JavaScript)\n- **Laravel** — aplicações web no servidor (PHP)\n- **Django** — aplicações web no servidor (Python)\n- **Angular** — interfaces web (JavaScript/TypeScript)\n\n## Por que usar um framework?\n\nEm vez de resolver os mesmos problemas de novo em cada projeto (organização de arquivos, segurança, navegação), o framework já resolveu isso — e você foca no que é específico do seu projeto.`,
     code: "", solution: "",
     completed: false, type: "theory",
+    furtherReading: { title: "Framework: o que é e para que serve", url: "https://blog.betrybe.com/framework-de-programacao/o-que-e-framework/" },
   },
   {
     id: "js-ex-5", courseId: "javascript-basics",
