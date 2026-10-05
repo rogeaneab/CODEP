@@ -11,6 +11,10 @@ export interface Course {
    * lib/progress.ts/getCourseProgress, calculado a partir do localStorage).
    * Mantido só por compatibilidade de dados antigos. */
   progress: number;
+  /** Trilha visível na biblioteca, mas travada de forma fixa (conteúdo
+   * ainda não revisado para o nível introdutório). Aparece como "Em breve"
+   * e não entra no desbloqueio progressivo — ver isCourseUnlocked. */
+  comingSoon?: boolean;
 }
 
 export interface Lesson {
@@ -35,19 +39,31 @@ export interface Lesson {
 }
 
 // A ordem deste array é a trilha de evolução do aluno: do básico ao
-// avançado. Cada curso só desbloqueia quando o anterior é 100% concluído
-// (ver isCourseUnlocked em lib/progress.ts) — o primeiro da lista está
-// sempre liberado.
+// avançado. Entre os cursos ativos (sem comingSoon), cada um só
+// desbloqueia quando o anterior é 100% concluído (ver isCourseUnlocked em
+// lib/progress.ts) — o primeiro da lista está sempre liberado. Cursos com
+// comingSoon:true ficam travados como "Em breve", fora dessa progressão.
 export const courses: Course[] = [
   {
-    id: "javascript-basics",
-    title: "Lógica de Programação com JavaScript",
-    description: "Entenda a lógica de programação usando JavaScript, uma das linguagens mais populares do mundo — a base para criar, analisar e resolver problemas computacionais de forma estruturada. Ideal também pra quem trabalha com marketing digital, UX, design ou áreas correlatas e quer entender melhor como a tecnologia funciona.",
+    id: "logica-programacao",
+    title: "Lógica de Programação",
+    description: "Entenda a lógica por trás de todo programa de computador — sequência, condição e repetição — sem se preocupar com a sintaxe de nenhuma linguagem ainda. A base pra tudo que vem depois, inclusive pra quem é de marketing digital, UX, design ou áreas correlatas e quer entender como a tecnologia pensa.",
     level: "Iniciante",
-    duration: "9 horas",
-    lessons: 13,
+    duration: "1 hora",
+    lessons: 3,
     image: "programming laptop code",
     category: "Lógica de Programação",
+    progress: 0,
+  },
+  {
+    id: "javascript-basics",
+    title: "JavaScript para Iniciantes",
+    description: "Agora que você já entende a lógica, aprenda JavaScript — uma das linguagens mais populares do mundo — pra colocar isso em prática e começar a criar, analisar e resolver problemas computacionais de verdade.",
+    level: "Iniciante",
+    duration: "8 horas",
+    lessons: 10,
+    image: "programming laptop code",
+    category: "JavaScript",
     progress: 0,
   },
   {
@@ -64,57 +80,62 @@ export const courses: Course[] = [
   {
     id: "react-fundamentals",
     title: "React Fundamentals",
-    description: "A mesma lógica de programação aplicada à criação de interfaces web modernas com React.",
+    description: "Construa aplicações web modernas com React.",
     level: "Intermediário",
     duration: "12 horas",
     lessons: 5,
     image: "web development interface",
     category: "React",
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "css-advanced",
     title: "CSS Avançado e Animações",
-    description: "A mesma lógica de programação aplicada à estilização e animação de interfaces com CSS.",
+    description: "Domine CSS Grid, Flexbox e animações complexas.",
     level: "Intermediário",
     duration: "10 horas",
     lessons: 4,
     image: "design interface creative",
     category: "CSS",
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "python-data-science",
     title: "Python para Data Science",
-    description: "A mesma lógica de programação aplicada à análise e visualização de dados com Python.",
+    description: "Análise de dados e visualização com Python.",
     level: "Intermediário",
     duration: "15 horas",
     lessons: 5,
     image: "data analytics graphs",
     category: "Python",
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "nodejs-backend",
     title: "Node.js Backend Development",
-    description: "A mesma lógica de programação aplicada à criação de APIs e serviços com Node.js.",
+    description: "Crie APIs robustas com Node.js e Express.",
     level: "Avançado",
     duration: "20 horas",
     lessons: 5,
     image: "server technology code",
     category: "Node.js",
     progress: 0,
+    comingSoon: true,
   },
   {
     id: "typescript-mastery",
     title: "TypeScript Mastery",
-    description: "A mesma lógica de programação, agora com tipagem estática, em projetos maiores com TypeScript.",
+    description: "TypeScript avançado para projetos escaláveis.",
     level: "Avançado",
     duration: "18 horas",
     lessons: 4,
     image: "coding typescript developer",
     category: "TypeScript",
     progress: 0,
+    comingSoon: true,
   },
 ];
 
@@ -129,7 +150,7 @@ const TS_VIDEO = "https://www.youtube.com/embed/30LWjhZzeSQ";
 export const lessons: Lesson[] = [
   // ── LÓGICA SEM CÓDIGO ───────────────────────────────────
   {
-    id: "logic-1", courseId: "javascript-basics",
+    id: "logic-1", courseId: "logica-programacao",
     title: "Lógica sem código: pensando como um programador",
     description: "Antes de escrever qualquer linha de código, entenda os 3 blocos que formam todo algoritmo.",
     content: `# Lógica sem código\n\nProgramar não é, no fundo, escrever numa linguagem — é descrever um processo passo a passo, de forma que não deixe dúvida sobre o que fazer. Isso é a **lógica de programação**, e ela existe antes e independente de qualquer linguagem.\n\nTodo algoritmo, não importa a linguagem, é feito de só 3 blocos:\n\n## 1. Sequência\n\nPassos em ordem, um depois do outro. Ex.: uma receita de bolo — você não pode colocar no forno antes de misturar os ingredientes.\n\n## 2. Condição (se... então... senão...)\n\nEscolher um caminho dependendo de uma situação. Ex.: "se estiver chovendo, leve guarda-chuva; senão, não leve."\n\n## 3. Repetição\n\nFazer a mesma coisa várias vezes, até algo acontecer. Ex.: "bata o ovo até ficar homogêneo."\n\nNos próximos exercícios você vai praticar isso sem escrever código nenhum — só organizando e lendo passos, como quem resolve um quebra-cabeça.`,
@@ -137,7 +158,7 @@ export const lessons: Lesson[] = [
     completed: false, type: "theory",
   },
   {
-    id: "logic-ex-1", courseId: "javascript-basics",
+    id: "logic-ex-1", courseId: "logica-programacao",
     title: "Exercício: Ordene os passos",
     description: "Coloque em ordem lógica os passos de uma tarefa do dia a dia.",
     content: `# Ordene os passos\n\nAbaixo estão os passos de "como fazer um miojo", fora de ordem.\n\n## Tarefa\n\nUse as setas pra colocar os passos na sequência lógica correta — a mesma ideia de organizar um algoritmo.`,
@@ -154,7 +175,7 @@ export const lessons: Lesson[] = [
     ],
   },
   {
-    id: "logic-ex-2", courseId: "javascript-basics",
+    id: "logic-ex-2", courseId: "logica-programacao",
     title: "Exercício: Preveja o resultado",
     description: "Leia o algoritmo em pseudocódigo (sem rodar nada) e descubra o que ele vai mostrar.",
     content: `# Preveja o resultado\n\nLeia o algoritmo abaixo com atenção, sem executar nada — só pensando.\n\n\`\`\`\nseja N = 7\n\nse N for maior que 5:\n    escreva "grande"\nsenão:\n    escreva "pequeno"\n\`\`\`\n\n## Tarefa\n\nO que esse algoritmo vai mostrar na tela?`,

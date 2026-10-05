@@ -25,13 +25,17 @@ export function CourseDetail() {
       <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
         <Lock className="text-slate-400" size={24} />
       </div>
-      <h2 className="text-xl font-extrabold text-slate-900 mb-2">{course.title} — trancado</h2>
+      <h2 className="text-xl font-extrabold text-slate-900 mb-2">
+        {course.comingSoon ? `${course.title} — em breve` : `${course.title} — trancado`}
+      </h2>
       <p className="text-slate-500 text-sm mb-6">
-        {previousCourse
-          ? <>Conclua <strong>{previousCourse.title}</strong> ({getCourseProgress(previousCourse.id)}%) pra liberar essa trilha.</>
-          : "Esta trilha ainda não está disponível."}
+        {course.comingSoon
+          ? "Esta trilha ainda está em revisão e vai abrir em breve."
+          : previousCourse
+            ? <>Conclua <strong>{previousCourse.title}</strong> ({getCourseProgress(previousCourse.id)}%) pra liberar essa trilha.</>
+            : "Esta trilha ainda não está disponível."}
       </p>
-      {previousCourse && (
+      {!course.comingSoon && previousCourse && (
         <Link to={`/app/courses/${previousCourse.id}`}
           className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">
           <Play size={15} />Ir para {previousCourse.title}
@@ -42,6 +46,7 @@ export function CourseDetail() {
 
   const getImageUrl = (id: string) => {
     const map: Record<string, string> = {
+      "logica-programacao": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=1200&h=500&fit=crop",
       "javascript-basics": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?w=1200&h=500&fit=crop",
       "git-github": "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=1200&h=500&fit=crop",
       "react-fundamentals": "https://images.unsplash.com/photo-1760548425425-e42e77fa38f1?w=1200&h=500&fit=crop",

@@ -101,19 +101,28 @@ export function getCourseProgress(courseId: string): number {
 export const POINTS_PER_LESSON_VALUE = POINTS_PER_LESSON;
 
 // A posição de um curso em data/courses.ts é a trilha de evolução: do
-// básico ao avançado. Um curso só libera quando o anterior está 100%
-// concluído — o primeiro da lista está sempre liberado.
+// básico ao avançado. Entre os cursos ativos (sem comingSoon), um curso só
+// libera quando o anterior está 100% concluído — o primeiro da trilha
+// ativa está sempre liberado. Curso com comingSoon:true fica travado como
+// "Em breve", fora dessa progressão (não libera por progresso nenhum).
+function activeCourseOrder(): string[] {
+  return courses.filter(c => !c.comingSoon).map(c => c.id);
+}
+
 export function isCourseUnlocked(courseId: string): boolean {
-  const order = courses.map(c => c.id);
+  const course = courses.find(c => c.id === courseId);
+  if (!course) return false;
+  if (course.comingSoon) return false;
+  const order = activeCourseOrder();
   const idx = order.indexOf(courseId);
   if (idx <= 0) return true;
   const previousCourseId = order[idx - 1];
   return getCourseProgress(previousCourseId) === 100;
 }
 
-/** Curso anterior na trilha (para mensagens de "conclua X pra liberar"). */
+/** Curso anterior na trilha ativa (para mensagens de "conclua X pra liberar"). */
 export function getPreviousCourse(courseId: string) {
-  const order = courses.map(c => c.id);
+  const order = activeCourseOrder();
   const idx = order.indexOf(courseId);
   if (idx <= 0) return undefined;
   return courses.find(c => c.id === order[idx - 1]);

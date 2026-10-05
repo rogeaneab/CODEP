@@ -9,6 +9,7 @@ import { courses, getLessonsByCourseId } from "../data/courses";
 import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo, isCourseUnlocked } from "../lib/progress";
 
 const imageMap: Record<string, string> = {
+  "logica-programacao": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&h=360&fit=crop",
   "javascript-basics": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?w=600&h=360&fit=crop",
   "git-github": "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&h=360&fit=crop",
   "react-fundamentals": "https://images.unsplash.com/photo-1760548425425-e42e77fa38f1?w=600&h=360&fit=crop",
