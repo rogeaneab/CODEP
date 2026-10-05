@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { getQuizById } from "../data/quizzes";
-import { addXp } from "../lib/progress";
+import { addXp, logActivity } from "../lib/progress";
 import { X, Heart, Zap, Trophy, RotateCcw, ArrowRight } from "lucide-react";
 
 type Phase = "playing" | "feedback" | "finished" | "gameover";
@@ -70,6 +70,7 @@ export function QuizGame({ quizIdProp, embedded, onExit }: QuizGameProps = {}) {
   const handleContinue = () => {
     if (currentIndex + 1 >= quiz.questions.length) {
       setPhase("finished");
+      logActivity("quiz", `Quiz de ${quiz.title} — ${correctCount}/${quiz.questions.length} corretas`);
     } else {
       setCurrentIndex((i) => i + 1);
       setSelected(null);

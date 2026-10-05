@@ -6,7 +6,7 @@ import {
   Code2, BarChart2, Sparkles,
 } from "lucide-react";
 import { courses, getLessonsByCourseId } from "../data/courses";
-import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo, isCourseUnlocked } from "../lib/progress";
+import { getCourseProgress, isLessonComplete, getTotalPoints, getCurrentLevelInfo, isCourseUnlocked, getRecentActivity, formatRelativeTime } from "../lib/progress";
 
 const imageMap: Record<string, string> = {
   "fundamentos-computacao": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&h=360&fit=crop",
@@ -58,12 +58,15 @@ export function Home() {
     { to: "/app/certificates", icon: <Award size={20} />, label: "Certificados", desc: "Suas conquistas", bg: "bg-sky-50", color: "text-sky-600" },
   ];
 
-  const recentActivity = [
-    { icon: <CheckCircle2 size={14} className="text-emerald-500" />, text: "Completou \"Introdução ao JavaScript\"", time: "Hoje" },
-    { icon: <Zap size={14} className="text-amber-500" />, text: "Quiz de JavaScript — 8/10 corretas", time: "Ontem" },
-    { icon: <CheckCircle2 size={14} className="text-emerald-500" />, text: "Completou \"Variáveis e Tipos de Dados\"", time: "2 dias atrás" },
-    { icon: <Target size={14} className="text-blue-500" />, text: "Desafio FizzBuzz resolvido", time: "3 dias atrás" },
-  ];
+  // Histórico real do aluno (aulas concluídas, quizzes finalizados),
+  // não dados fictícios — ver lib/progress.ts/getRecentActivity.
+  const recentActivity = getRecentActivity(4).map(entry => ({
+    icon: entry.type === "quiz"
+      ? <Zap size={14} className="text-amber-500" />
+      : <CheckCircle2 size={14} className="text-emerald-500" />,
+    text: entry.text,
+    time: formatRelativeTime(entry.timestamp),
+  }));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-12">
@@ -264,7 +267,7 @@ export function Home() {
               <h2 className="text-sm font-extrabold text-slate-900">Atividade recente</h2>
             </div>
             <div className="space-y-3">
-              {recentActivity.map((item, i) => (
+              {recentActivity.length > 0 ? recentActivity.map((item, i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   <div className="mt-0.5 flex-shrink-0">{item.icon}</div>
                   <div className="flex-1 min-w-0">
@@ -272,7 +275,11 @@ export function Home() {
                     <p className="text-xs text-slate-400 mt-0.5">{item.time}</p>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="text-xs text-slate-400 text-center py-4">
+                  Nenhuma atividade ainda — conclua uma aula ou um quiz pra ver aqui.
+                </p>
+              )}
             </div>
           </div>
 

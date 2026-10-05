@@ -2,10 +2,12 @@
 // Substitui os campos estáticos `lesson.completed` / `course.progress`
 // de data/courses.ts, que são só uma semente inicial fictícia.
 
-import { getLessonsByCourseId, courses } from "../data/courses";
+import { getLessonsByCourseId, getLessonById, courses } from "../data/courses";
 
 const STORAGE_KEY = "codep_progress_v1";
+const ACTIVITY_KEY = "codep_activity_v1";
 const POINTS_PER_LESSON = 10;
+const MAX_ACTIVITY_ENTRIES = 30;
 
 interface ProgressState {
   completedLessonIds: string[];
@@ -47,6 +49,10 @@ export function markLessonComplete(lessonId: string): { alreadyDone: boolean; po
   state.completedLessonIds.push(lessonId);
   state.points += POINTS_PER_LESSON;
   writeState(state);
+  const lesson = getLessonById(lessonId);
+  if (lesson) {
+    logActivity("lesson", `Completou "${lesson.title}"`);
+  }
   return { alreadyDone: false, points: state.points };
 }
 
@@ -126,4 +132,61 @@ export function getPreviousCourse(courseId: string) {
   const idx = order.indexOf(courseId);
   if (idx <= 0) return undefined;
   return courses.find(c => c.id === order[idx - 1]);
+}
+
+// ── Atividade recente ───────────────────────────────────────────────────
+// Histórico real do que o aluno fez (aula concluída, quiz finalizado),
+// pra exibir na Home em vez de dados fictícios. Guardado separado do
+// progresso pra não misturar "o que foi feito" com "o que está feito".
+
+export interface ActivityEntry {
+  id: string;
+  type: "lesson" | "quiz";
+  text: string;
+  timestamp: number;
+}
+
+function readActivity(): ActivityEntry[] {
+  try {
+    const raw = localStorage.getItem(ACTIVITY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeActivity(entries: ActivityEntry[]) {
+  try {
+    localStorage.setItem(ACTIVITY_KEY, JSON.stringify(entries));
+  } catch {
+    // localStorage indisponível — segue sem persistir
+  }
+}
+
+/** Registra um evento real (aula concluída, quiz finalizado) no topo do
+ * histórico, mantendo só os mais recentes. */
+export function logActivity(type: ActivityEntry["type"], text: string): void {
+  const entries = readActivity();
+  entries.unshift({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, type, text, timestamp: Date.now() });
+  writeActivity(entries.slice(0, MAX_ACTIVITY_ENTRIES));
+}
+
+/** Últimas N atividades reais do aluno, mais recente primeiro. */
+export function getRecentActivity(limit = 4): ActivityEntry[] {
+  return readActivity().slice(0, limit);
+}
+
+/** Formata um timestamp como "Hoje", "Ontem", "X dias atrás" etc. */
+export function formatRelativeTime(timestamp: number): string {
+  const diffMs = Date.now() - timestamp;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays <= 0) return "Hoje";
+  if (diffDays === 1) return "Ontem";
+  if (diffDays < 7) return `${diffDays} dias atrás`;
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffWeeks === 1) return "1 semana atrás";
+  if (diffDays < 30) return `${diffWeeks} semanas atrás`;
+  return new Date(timestamp).toLocaleDateString("pt-BR");
 }
