@@ -136,7 +136,7 @@ export function LandingPage() {
             </h1>
 
             <p className="text-slate-500 text-lg mb-8 leading-relaxed">
-              Desenvolva suas habilidades em programação através de aulas práticas, exercícios interativos, quizzes e desafios criados especialmente para iniciantes.
+              Entenda a lógica de programação com uma das linguagens mais populares do mundo e aprenda a usar o GitHub — a base para criar, analisar e resolver problemas computacionais, mesmo se você vem de marketing digital, UX, design ou áreas correlatas.
             </p>
 
             <div className="flex flex-wrap gap-3 mb-10">
@@ -179,7 +179,7 @@ export function LandingPage() {
                 />
               </div>
               <div className="absolute -top-3 -right-3 bg-blue-600 text-white px-3 py-1.5 rounded-xl shadow-md text-xs font-bold border-2 border-white">
-                &lt;/&gt; JavaScript
+                &lt;/&gt; Lógica + GitHub
               </div>
               <div className="absolute -bottom-3 -left-3 bg-white text-slate-800 px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-sm font-bold border border-gray-100">
                 <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
@@ -220,7 +220,7 @@ export function LandingPage() {
               Por que escolher o <span className="text-blue-600">CODEP</span>?
             </h2>
             <p className="text-slate-500 text-base max-w-2xl mx-auto leading-relaxed">
-              A plataforma foi criada para facilitar o aprendizado de programação para estudantes que estão dando seus primeiros passos na área da tecnologia.
+              A plataforma foi criada para ensinar a lógica de programação de forma estruturada, usando linguagens populares e o GitHub como ferramenta de colaboração. Também ajuda quem atua em marketing digital, UX, design ou áreas correlatas a entender como a área de tecnologia funciona e se comunicar melhor com o time de desenvolvimento.
             </p>
           </div>
 

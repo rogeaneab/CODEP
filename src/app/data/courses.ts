@@ -30,20 +30,20 @@ export interface Lesson {
 export const courses: Course[] = [
   {
     id: "javascript-basics",
-    title: "JavaScript para Iniciantes",
-    description: "Aprenda os fundamentos da programação JavaScript do zero",
+    title: "Lógica de Programação com JavaScript",
+    description: "Entenda a lógica de programação usando JavaScript — uma das linguagens mais populares do mundo — e aprenda a versionar seu código no GitHub. Ideal também pra quem trabalha com marketing digital, UX, design ou áreas correlatas e quer entender melhor como a tecnologia funciona.",
     level: "Iniciante",
-    duration: "8 horas",
-    lessons: 10,
+    duration: "9 horas",
+    lessons: 12,
     image: "programming laptop code",
-    category: "JavaScript",
+    category: "Lógica de Programação",
     enrolled: true,
     progress: 0,
   },
   {
     id: "react-fundamentals",
     title: "React Fundamentals",
-    description: "Construa aplicações web modernas com React",
+    description: "A mesma lógica de programação aplicada à criação de interfaces web modernas com React.",
     level: "Intermediário",
     duration: "12 horas",
     lessons: 5,
@@ -56,7 +56,7 @@ export const courses: Course[] = [
   {
     id: "python-data-science",
     title: "Python para Data Science",
-    description: "Análise de dados e visualização com Python",
+    description: "A mesma lógica de programação aplicada à análise e visualização de dados com Python.",
     level: "Intermediário",
     duration: "15 horas",
     lessons: 5,
@@ -69,7 +69,7 @@ export const courses: Course[] = [
   {
     id: "nodejs-backend",
     title: "Node.js Backend Development",
-    description: "Crie APIs robustas com Node.js e Express",
+    description: "A mesma lógica de programação aplicada à criação de APIs e serviços com Node.js.",
     level: "Avançado",
     duration: "20 horas",
     lessons: 5,
@@ -82,7 +82,7 @@ export const courses: Course[] = [
   {
     id: "css-advanced",
     title: "CSS Avançado e Animações",
-    description: "Domine CSS Grid, Flexbox e animações complexas",
+    description: "A mesma lógica de programação aplicada à estilização e animação de interfaces com CSS.",
     level: "Intermediário",
     duration: "10 horas",
     lessons: 4,
@@ -95,7 +95,7 @@ export const courses: Course[] = [
   {
     id: "typescript-mastery",
     title: "TypeScript Mastery",
-    description: "TypeScript avançado para projetos escaláveis",
+    description: "A mesma lógica de programação, agora com tipagem estática, em projetos maiores com TypeScript.",
     level: "Avançado",
     duration: "18 horas",
     lessons: 4,
@@ -108,6 +108,7 @@ export const courses: Course[] = [
 ];
 
 const JS_VIDEO = "https://www.youtube.com/embed/PkZNo7MFNFg";
+const GITHUB_VIDEO = "https://www.youtube.com/embed/RGOj5yH7evk";
 const REACT_VIDEO = "https://www.youtube.com/embed/bMknfKXIFA8";
 const PYTHON_VIDEO = "https://www.youtube.com/embed/rfscVS0vtbw";
 const NODE_VIDEO = "https://www.youtube.com/embed/Oe421EPjeBE";
@@ -200,6 +201,24 @@ export const lessons: Lesson[] = [
     content: `# DOM\n\nO Document Object Model representa a página como uma árvore.\n\n\`\`\`js\ndocument.getElementById('btn').addEventListener('click', () => {\n  alert('Clicou!');\n});\n\`\`\``,
     code: "// No browser:\n// document.querySelector('h1').textContent = 'Olá!';", solution: "",
     completed: false, type: "theory", videoUrl: JS_VIDEO,
+  },
+  {
+    id: "js-7", courseId: "javascript-basics",
+    title: "Controle de Versão com Git e GitHub",
+    description: "Entenda repositórios, commits, branches e pull requests, e por que todo projeto de software usa isso.",
+    content: `# Git e GitHub\n\nGit é um sistema de controle de versão: ele guarda o histórico de mudanças do seu código.\nGitHub é uma plataforma online pra hospedar repositórios Git e colaborar com outras pessoas em um projeto.\n\n## Conceitos principais\n\n- **Repositório**: a pasta do projeto, com todo o histórico de mudanças\n- **Commit**: um "registro" de uma mudança, com uma mensagem explicando o que foi feito\n- **Branch**: uma linha paralela de desenvolvimento, pra testar algo sem afetar o código principal\n- **Pull Request**: um pedido pra juntar as mudanças de uma branch no projeto principal, revisado por outras pessoas\n\n## Por que isso importa mesmo fora da programação?\n\nTimes de marketing, UX e design também usam fluxos parecidos (versões, histórico, revisão) em outras ferramentas. Entender a lógica do Git ajuda a se comunicar melhor com o time de desenvolvimento.`,
+    code: "// Exemplo: histórico de commits de um projeto\nconst commits = [\n  'Cria estrutura inicial do projeto',\n  'Adiciona tela de login',\n];\n\nconsole.log(commits);",
+    solution: "const commits = [\n  'Cria estrutura inicial do projeto',\n  'Adiciona tela de login',\n];\n\nconsole.log(commits);",
+    completed: false, type: "theory", videoUrl: GITHUB_VIDEO,
+  },
+  {
+    id: "js-ex-7", courseId: "javascript-basics",
+    title: "Exercício: Mensagens de Commit",
+    description: "Pratique escrever boas mensagens de commit, descrevendo mudanças de forma clara.",
+    content: `# Mensagens de Commit\n\nUma boa mensagem de commit descreve **o que mudou** de forma clara e direta.\n\n## Tarefa\n\n1. Crie um array \`commits\` com 3 mensagens de commit descrevendo etapas de um projeto fictício (ex.: "Cria página inicial", "Corrige bug no formulário")\n2. Exiba cada mensagem no console, numerada`,
+    code: "// Escreva seu código aqui\n",
+    solution: `const commits = [\n  "Cria página inicial",\n  "Adiciona validação do formulário",\n  "Corrige bug no botão de envio"\n];\n\ncommits.forEach((msg, i) => console.log(\`\${i + 1}. \${msg}\`));`,
+    completed: false, type: "practice",
   },
 
   // ── REACT ────────────────────────────────────────────────
