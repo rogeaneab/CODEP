@@ -262,8 +262,8 @@ export function LandingPage() {
             {courses.map((course) => {
               const imageMap: Record<string, string> = {
                 "fundamentos-computacao": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&h=360&fit=crop",
-                "logica-programacao": "https://images.unsplash.com/photo-1661961110372-8a7d81e3a3c8?w=600&h=360&fit=crop",
-                "javascript-basics": "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=600&h=360&fit=crop",
+                "logica-programacao": "https://images.unsplash.com/photo-1606327054629-64c8b0fd6e4f?w=600&h=360&fit=crop",
+                "javascript-basics": "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=600&h=360&fit=crop",
                 "banco-de-dados": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&h=360&fit=crop",
                 "desenvolvimento-web": "https://images.unsplash.com/photo-1760548425425-e42e77fa38f1?w=600&h=360&fit=crop",
               };
