@@ -47,7 +47,7 @@ export const courses: Course[] = [
   {
     id: "fundamentos-computacao",
     title: "Fundamentos da Computação",
-    description: "História da programação, como o computador processa dados, tipos de linguagens e como a internet conecta tudo. A base pra entender o que é programar, antes de escrever a primeira linha de código.",
+    description: "A base de tudo: história da programação, como o computador processa dados e tipos de linguagens.",
     level: "Iniciante",
     duration: "50 min",
     lessons: 7,
@@ -58,7 +58,7 @@ export const courses: Course[] = [
   {
     id: "logica-programacao",
     title: "Lógica de Programação",
-    description: "Os blocos que formam todo algoritmo — sequência, condição e repetição — e como pensar como um programador antes de escrever código em qualquer linguagem.",
+    description: "Os blocos de todo algoritmo: sequência, condição e repetição.",
     level: "Iniciante",
     duration: "30 min",
     lessons: 4,
@@ -69,7 +69,7 @@ export const courses: Course[] = [
   {
     id: "javascript-basics",
     title: "JavaScript para Iniciantes",
-    description: "Seus primeiros programas de verdade: variáveis, laços de repetição, condicionais, funções e arrays em JavaScript, com exercícios práticos no navegador.",
+    description: "Seus primeiros programas: variáveis, laços, condicionais, funções e arrays.",
     level: "Iniciante",
     duration: "2 horas",
     lessons: 11,
@@ -80,7 +80,7 @@ export const courses: Course[] = [
   {
     id: "banco-de-dados",
     title: "Banco de Dados",
-    description: "Como os programas guardam informação de forma organizada: bancos relacionais, tabelas e a linguagem SQL.",
+    description: "Como os programas guardam dados: tabelas relacionais e a linguagem SQL.",
     level: "Iniciante",
     duration: "30 min",
     lessons: 3,
@@ -91,7 +91,7 @@ export const courses: Course[] = [
   {
     id: "desenvolvimento-web",
     title: "Desenvolvimento Web: PHP e Frameworks",
-    description: "Como sites dinâmicos funcionam no servidor com PHP, e por que frameworks como React, Laravel e Django aceleram o desenvolvimento.",
+    description: "Como sites dinâmicos funcionam no servidor com PHP e frameworks.",
     level: "Intermediário",
     duration: "20 min",
     lessons: 2,
