@@ -47,9 +47,9 @@ export function CourseDetail() {
   const getImageUrl = (id: string) => {
     const map: Record<string, string> = {
       "fundamentos-computacao": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=1200&h=500&fit=crop",
-      "logica-programacao": "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=1200&h=500&fit=crop",
-      "javascript-basics": "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=1200&h=500&fit=crop",
-      "banco-de-dados": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=1200&h=500&fit=crop",
+      "logica-programacao": "https://images.unsplash.com/photo-1737505599159-5ffc1dcbc08f?w=1200&h=500&fit=crop",
+      "javascript-basics": "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=1200&h=500&fit=crop",
+      "banco-de-dados": "https://images.unsplash.com/photo-1741298167227-2bc78de45233?w=1200&h=500&fit=crop",
       "desenvolvimento-web": "https://images.unsplash.com/photo-1760548425425-e42e77fa38f1?w=1200&h=500&fit=crop",
     };
     return map[id] || map["fundamentos-computacao"];
