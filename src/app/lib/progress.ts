@@ -1,0 +1,70 @@
+// Progresso real do aluno, persistido no navegador (localStorage).
+// Substitui os campos estáticos `lesson.completed` / `course.progress`
+// de data/courses.ts, que são só uma semente inicial fictícia.
+
+import { getLessonsByCourseId } from "../data/courses";
+
+const STORAGE_KEY = "codep_progress_v1";
+const POINTS_PER_LESSON = 10;
+
+interface ProgressState {
+  completedLessonIds: string[];
+  points: number;
+}
+
+function readState(): ProgressState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { completedLessonIds: [], points: 0 };
+    const parsed = JSON.parse(raw);
+    return {
+      completedLessonIds: Array.isArray(parsed.completedLessonIds) ? parsed.completedLessonIds : [],
+      points: typeof parsed.points === "number" ? parsed.points : 0,
+    };
+  } catch {
+    return { completedLessonIds: [], points: 0 };
+  }
+}
+
+function writeState(state: ProgressState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // localStorage indisponível (modo privado, etc.) — segue sem persistir
+  }
+}
+
+export function isLessonComplete(lessonId: string): boolean {
+  return readState().completedLessonIds.includes(lessonId);
+}
+
+/** Marca a aula/exercício como concluído e soma pontos (só na primeira vez). */
+export function markLessonComplete(lessonId: string): { alreadyDone: boolean; points: number } {
+  const state = readState();
+  if (state.completedLessonIds.includes(lessonId)) {
+    return { alreadyDone: true, points: state.points };
+  }
+  state.completedLessonIds.push(lessonId);
+  state.points += POINTS_PER_LESSON;
+  writeState(state);
+  return { alreadyDone: false, points: state.points };
+}
+
+export function getTotalPoints(): number {
+  return readState().points;
+}
+
+export function getCompletedCount(lessonIds: string[]): number {
+  const state = readState();
+  return lessonIds.filter(id => state.completedLessonIds.includes(id)).length;
+}
+
+/** Progresso (0-100) de um curso, com base nas aulas realmente concluídas. */
+export function getCourseProgress(courseId: string): number {
+  const all = getLessonsByCourseId(courseId);
+  if (all.length === 0) return 0;
+  const done = getCompletedCount(all.map(l => l.id));
+  return Math.round((done / all.length) * 100);
+}
+
+export const POINTS_PER_LESSON_VALUE = POINTS_PER_LESSON;

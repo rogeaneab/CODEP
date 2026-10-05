@@ -1,11 +1,12 @@
 import { courses } from "../data/courses";
+import { getCourseProgress } from "../lib/progress";
 import { Award, BookOpen, Clock, Download, Lock, GraduationCap, CheckCircle2, Code2 } from "lucide-react";
 
 function generateCredentialId(courseId: string) {
   return `CODEP-2026-${courseId.toUpperCase().replace(/-/g, "").slice(0, 8)}`;
 }
 
-function CertificateCard({ course, unlocked }: { course: typeof courses[0]; unlocked: boolean }) {
+function CertificateCard({ course, unlocked, progress }: { course: typeof courses[0]; unlocked: boolean; progress: number }) {
   const credentialId = generateCredentialId(course.id);
 
   if (!unlocked) {
@@ -26,10 +27,10 @@ function CertificateCard({ course, unlocked }: { course: typeof courses[0]; unlo
           <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-slate-400 font-medium">Progresso</span>
-              <span className="text-slate-500 font-bold">{course.progress}%</span>
+              <span className="text-slate-500 font-bold">{progress}%</span>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-1.5">
-              <div className="bg-blue-400 h-1.5 rounded-full" style={{ width: `${course.progress}%` }} />
+              <div className="bg-blue-400 h-1.5 rounded-full" style={{ width: `${progress}%` }} />
             </div>
           </div>
           <p className="text-xs text-slate-400">Complete 100% do curso para desbloquear o certificado.</p>
@@ -86,8 +87,9 @@ function CertificateCard({ course, unlocked }: { course: typeof courses[0]; unlo
 
 export function Certificates() {
   const enrolledCourses = courses.filter(c => c.enrolled);
-  const unlockedCerts = enrolledCourses.filter(c => c.progress >= 100);
-  const inProgressCerts = enrolledCourses.filter(c => c.progress < 100);
+  const progressByCourse = new Map(enrolledCourses.map(c => [c.id, getCourseProgress(c.id)]));
+  const unlockedCerts = enrolledCourses.filter(c => (progressByCourse.get(c.id) ?? 0) >= 100);
+  const inProgressCerts = enrolledCourses.filter(c => (progressByCourse.get(c.id) ?? 0) < 100);
 
   return (
     <div className="pb-24 md:pb-8">
@@ -151,7 +153,7 @@ export function Certificates() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {unlockedCerts.map(course => (
-                <CertificateCard key={course.id} course={course} unlocked={true} />
+                <CertificateCard key={course.id} course={course} unlocked={true} progress={progressByCourse.get(course.id) ?? 0} />
               ))}
             </div>
           </div>
@@ -166,7 +168,7 @@ export function Certificates() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {inProgressCerts.map(course => (
-                <CertificateCard key={course.id} course={course} unlocked={false} />
+                <CertificateCard key={course.id} course={course} unlocked={false} progress={progressByCourse.get(course.id) ?? 0} />
               ))}
             </div>
           </div>

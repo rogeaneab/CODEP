@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import { getLessonById, getLessonsByCourseId, getCourseById } from "../data/courses";
-import { ArrowLeft, ArrowRight, CheckCircle2, Layers, Code2, Video, RotateCcw, Play, Lightbulb, ChevronRight } from "lucide-react";
+import { isLessonComplete, markLessonComplete, POINTS_PER_LESSON_VALUE } from "../lib/progress";
+import { ArrowLeft, ArrowRight, CheckCircle2, Layers, Code2, Video, RotateCcw, Play, Lightbulb, ChevronRight, Sparkles } from "lucide-react";
 
 export function Lesson() {
   const { courseId, lessonId } = useParams();
@@ -19,14 +20,17 @@ export function Lesson() {
   const [showSolution, setShowSolution] = useState(false);
   const [showHints, setShowHints] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [justEarnedPoints, setJustEarnedPoints] = useState(false);
 
   useEffect(() => {
     if (lesson) {
-      setWatched(lesson.completed);
+      const done = isLessonComplete(lesson.id);
+      setWatched(done);
       setCode(lesson.code);
-      setIsCompleted(lesson.completed);
+      setIsCompleted(done);
       setOutput("");
       setShowSolution(false);
+      setJustEarnedPoints(false);
     }
   }, [lessonId, lesson]);
 
@@ -58,8 +62,10 @@ export function Lesson() {
   const checkSolution = () => {
     const norm = (s: string) => s.trim().replace(/\s+/g, " ");
     if (norm(code) === norm(lesson.solution)) {
+      const { alreadyDone } = markLessonComplete(lesson.id);
       setOutput("✅ Parabéns! Solução correta!");
       setIsCompleted(true);
+      setJustEarnedPoints(!alreadyDone);
     } else {
       setOutput("❌ Ainda não está correto. Tente novamente ou veja a solução.");
     }
@@ -111,7 +117,11 @@ export function Lesson() {
                   <p className="text-sm text-slate-400">{lesson.description}</p>
                 </div>
                 {!watched && (
-                  <button onClick={() => setWatched(true)}
+                  <button onClick={() => {
+                    const { alreadyDone } = markLessonComplete(lesson.id);
+                    setWatched(true);
+                    setJustEarnedPoints(!alreadyDone);
+                  }}
                     className="flex-shrink-0 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition">
                     <CheckCircle2 size={15} />Assistida
                   </button>
@@ -125,7 +135,14 @@ export function Lesson() {
                   <div className="w-10 h-10 bg-emerald-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 size={18} className="text-emerald-400" />
                   </div>
-                  <p className="font-bold text-white">Aula concluída! Boa.</p>
+                  <div>
+                    <p className="font-bold text-white">Aula concluída! Boa.</p>
+                    {justEarnedPoints && (
+                      <p className="text-xs text-emerald-300 font-semibold flex items-center gap-1 mt-0.5">
+                        <Sparkles size={12} />+{POINTS_PER_LESSON_VALUE} pontos
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <Link to={`/app/courses/${courseId}/lessons/${nextLesson.id}`}
                   className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition">
@@ -165,7 +182,7 @@ export function Lesson() {
             <div className="flex gap-1">
               {allLessons.map(l => (
                 <Link key={l.id} to={`/app/courses/${courseId}/lessons/${l.id}`}>
-                  <div className={`h-2 rounded-full transition-all ${l.id === lessonId ? "bg-blue-500 w-4" : l.completed ? "bg-emerald-500 w-2" : "bg-slate-700 w-2"}`} />
+                  <div className={`h-2 rounded-full transition-all ${l.id === lessonId ? "bg-blue-500 w-4" : isLessonComplete(l.id) ? "bg-emerald-500 w-2" : "bg-slate-700 w-2"}`} />
                 </Link>
               ))}
             </div>
@@ -263,7 +280,14 @@ export function Lesson() {
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4 flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
-                <p className="text-sm font-bold text-emerald-800">Exercício concluído! Boa.</p>
+                <div>
+                  <p className="text-sm font-bold text-emerald-800">Exercício concluído! Boa.</p>
+                  {justEarnedPoints && (
+                    <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1 mt-0.5">
+                      <Sparkles size={11} />+{POINTS_PER_LESSON_VALUE} pontos
+                    </p>
+                  )}
+                </div>
               </div>
               {nextLesson && (
                 <Link to={`/app/courses/${courseId}/lessons/${nextLesson.id}`}

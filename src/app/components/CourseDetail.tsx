@@ -1,6 +1,7 @@
 import { Link, useParams, useNavigate } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { getCourseById, getLessonsByCourseId } from "../data/courses";
+import { isLessonComplete } from "../lib/progress";
 import { ArrowLeft, BookOpen, Clock, CheckCircle2, Play, GraduationCap, BarChart2, Video, Layers, Lock } from "lucide-react";
 
 export function CourseDetail() {
@@ -45,7 +46,7 @@ export function CourseDetail() {
     return map[id] || map["javascript-basics"];
   };
 
-  const completedLessons = lessons.filter(l => l.completed).length;
+  const completedLessons = lessons.filter(l => isLessonComplete(l.id)).length;
   const progressPct = lessons.length > 0 ? Math.round((completedLessons / lessons.length) * 100) : 0;
 
   const levelBadge: Record<string, string> = {
@@ -54,7 +55,7 @@ export function CourseDetail() {
     "Avançado": "bg-red-50 text-red-700 border border-red-200",
   };
 
-  const nextLesson = lessons.find(l => !l.completed) || lessons[0];
+  const nextLesson = lessons.find(l => !isLessonComplete(l.id)) || lessons[0];
 
   return (
     <div className="pb-20 md:pb-8">
@@ -118,7 +119,7 @@ export function CourseDetail() {
                         className="w-full h-full object-cover opacity-70"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        {lesson.completed
+                        {isLessonComplete(lesson.id)
                           ? <CheckCircle2 size={22} className="text-emerald-400 drop-shadow" />
                           : <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow group-hover:bg-blue-600 group-hover:text-white transition-colors">
                               <Play size={13} className="text-slate-800 group-hover:text-white ml-0.5" />
@@ -139,7 +140,7 @@ export function CourseDetail() {
                       <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{lesson.description}</p>
                     </div>
 
-                    {lesson.completed && (
+                    {isLessonComplete(lesson.id) && (
                       <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
                     )}
                   </Link>

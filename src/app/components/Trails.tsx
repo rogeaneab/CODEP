@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { courses, lessons } from "../data/courses";
+import { getCourseProgress, isLessonComplete } from "../lib/progress";
 import {
   CheckCircle2, Lock, Globe, BarChart2, Server,
   Palette, Award, Clock, BookOpen, ChevronRight, Play,
@@ -76,11 +77,11 @@ export function Trails() {
     .filter((c): c is typeof courses[number] => !!c && !c.comingSoon);
 
   const totalHours = trailCourses.reduce((acc, c) => acc + parseInt(c.duration), 0);
-  const completedCount = trailCourses.filter(c => c.progress === 100).length;
+  const completedCount = trailCourses.filter(c => getCourseProgress(c.id) === 100).length;
   const progressPct = Math.round((completedCount / trailCourses.length) * 100);
 
   // Find the first non-completed course to highlight as "current"
-  const currentIndex = trailCourses.findIndex(c => c.progress < 100);
+  const currentIndex = trailCourses.findIndex(c => getCourseProgress(c.id) < 100);
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 pb-24 md:pb-12">
@@ -95,7 +96,7 @@ export function Trails() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         {trails.map(t => {
           const tCourses = t.courseIds.map(id => courses.find(c => c.id === id)).filter((c): c is typeof courses[number] => !!c && !c.comingSoon);
-          const tCompleted = tCourses.filter(c => c.progress === 100).length;
+          const tCompleted = tCourses.filter(c => getCourseProgress(c.id) === 100).length;
           const tPct = Math.round((tCompleted / tCourses.length) * 100);
           const isActive = t.id === activeTrail;
 
@@ -170,12 +171,12 @@ export function Trails() {
 
         <div className="space-y-4">
           {trailCourses.map((course, index) => {
-            const isDone = course.progress === 100;
+            const isDone = getCourseProgress(course.id) === 100;
             const isCurrent = index === currentIndex;
             const lc = levelColor[course.level] || { bg: "bg-slate-100", text: "text-slate-600" };
             const exercises = lessons.filter(l => l.courseId === course.id && !l.videoUrl);
             const firstExercise = exercises[0];
-            const doneExercises = exercises.filter(l => l.completed).length;
+            const doneExercises = exercises.filter(l => isLessonComplete(l.id)).length;
 
             return (
               <div key={course.id} className="relative flex gap-5">
@@ -216,9 +217,9 @@ export function Trails() {
                       <Link key={ex.id} to={`/app/courses/${course.id}/lessons/${ex.id}`}
                         className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50/50 transition group">
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                          ex.completed ? "bg-emerald-500 text-white" : "bg-blue-100 text-blue-600"
+                          isLessonComplete(ex.id) ? "bg-emerald-500 text-white" : "bg-blue-100 text-blue-600"
                         }`}>
-                          {ex.completed ? <CheckCircle2 size={14} /> : ei + 1}
+                          {isLessonComplete(ex.id) ? <CheckCircle2 size={14} /> : ei + 1}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold text-slate-900 truncate group-hover:text-blue-600 transition">{ex.title}</p>

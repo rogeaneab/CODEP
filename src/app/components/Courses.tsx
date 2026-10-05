@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { courses } from "../data/courses";
+import { getCourseProgress } from "../lib/progress";
 import { BookOpen, Clock, Search, SlidersHorizontal, Lock } from "lucide-react";
 
 export function Courses() {
@@ -76,6 +77,7 @@ export function Courses() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filtered.map(course => {
+          const pct = course.enrolled ? getCourseProgress(course.id) : course.progress;
           const card = (
             <div className="relative h-48 overflow-hidden">
               <ImageWithFallback src={getImageUrl(course.id)} alt={course.title}
@@ -90,7 +92,7 @@ export function Courses() {
                 </div>
               ) : course.enrolled && (
                 <div className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                  {course.progress}%
+                  {pct}%
                 </div>
               )}
             </div>
@@ -107,9 +109,9 @@ export function Courses() {
                 <div className="mb-3">
                   <div className="w-full bg-slate-100 rounded-full h-1.5">
                     <div className="bg-blue-500 h-1.5 rounded-full"
-                      style={{ width: `${course.progress}%` }} />
+                      style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">{course.progress}% concluído</p>
+                  <p className="text-xs text-slate-400 mt-1 font-medium">{pct}% concluído</p>
                 </div>
               )}
               <div className="flex items-center justify-between text-xs text-slate-400 font-medium pt-3 border-t border-gray-100">

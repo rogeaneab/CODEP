@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { courses } from "../data/courses";
+import { getCourseProgress, getTotalPoints } from "../lib/progress";
 import {
   BookOpen, Award, TrendingUp, Clock, Settings, Flame,
   CheckCircle2, Lock, Mail, User, Calendar, ChevronRight,
-  Star, Target, Zap, GraduationCap, Edit3, X, Save,
+  Star, Target, Zap, GraduationCap, Edit3, X, Save, Sparkles,
 } from "lucide-react";
 
 export function Profile() {
   const enrolledCourses = courses.filter(c => c.enrolled);
+  const progressByCourse = new Map(enrolledCourses.map(c => [c.id, getCourseProgress(c.id)]));
   const totalLessons = enrolledCourses.reduce((acc, c) => acc + c.lessons, 0);
   const completedLessons = Math.floor(
-    enrolledCourses.reduce((acc, c) => acc + (c.lessons * c.progress) / 100, 0)
+    enrolledCourses.reduce((acc, c) => acc + (c.lessons * (progressByCourse.get(c.id) ?? 0)) / 100, 0)
   );
   const totalHours = enrolledCourses.reduce((acc, c) => acc + parseInt(c.duration), 0);
+  const totalPoints = getTotalPoints();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const [editing, setEditing] = useState(false);
@@ -36,10 +39,10 @@ export function Profile() {
   const achievements = [
     { icon: <Star size={20} />, bg: "bg-amber-50", color: "text-amber-500", border: "border-amber-200", title: "Primeira Aula", desc: "Completou a primeira aula", unlocked: completedLessons >= 1 },
     { icon: <Flame size={20} />, bg: "bg-orange-50", color: "text-orange-500", border: "border-orange-200", title: "7 Dias Seguidos", desc: "Estudou por 7 dias consecutivos", unlocked: true },
-    { icon: <TrendingUp size={20} />, bg: "bg-emerald-50", color: "text-emerald-600", border: "border-emerald-200", title: "Em Progresso", desc: "50% de um curso concluído", unlocked: enrolledCourses.some(c => c.progress >= 50) },
+    { icon: <TrendingUp size={20} />, bg: "bg-emerald-50", color: "text-emerald-600", border: "border-emerald-200", title: "Em Progresso", desc: "50% de um curso concluído", unlocked: enrolledCourses.some(c => (progressByCourse.get(c.id) ?? 0) >= 50) },
     { icon: <Target size={20} />, bg: "bg-blue-50", color: "text-blue-600", border: "border-blue-200", title: "Desafiante", desc: "Resolveu um desafio de código", unlocked: false },
     { icon: <Zap size={20} />, bg: "bg-yellow-50", color: "text-yellow-600", border: "border-yellow-200", title: "Quiz Master", desc: "10/10 num quiz", unlocked: false },
-    { icon: <GraduationCap size={20} />, bg: "bg-sky-50", color: "text-sky-600", border: "border-sky-200", title: "Graduado", desc: "Concluiu um curso completo", unlocked: enrolledCourses.some(c => c.progress === 100) },
+    { icon: <GraduationCap size={20} />, bg: "bg-sky-50", color: "text-sky-600", border: "border-sky-200", title: "Graduado", desc: "Concluiu um curso completo", unlocked: enrolledCourses.some(c => (progressByCourse.get(c.id) ?? 0) === 100) },
     { icon: <BookOpen size={20} />, bg: "bg-indigo-50", color: "text-indigo-600", border: "border-indigo-200", title: "Estudioso", desc: "3 cursos matriculados", unlocked: enrolledCourses.length >= 3 },
     { icon: <Award size={20} />, bg: "bg-rose-50", color: "text-rose-600", border: "border-rose-200", title: "Certificado", desc: "Recebeu um certificado", unlocked: false },
   ];
@@ -148,9 +151,9 @@ export function Profile() {
                 <Link key={course.id} to={`/app/courses/${course.id}`}
                   className="flex items-center gap-3 group">
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    course.progress === 100 ? "bg-emerald-50" : "bg-blue-50"
+                    (progressByCourse.get(course.id) ?? 0) === 100 ? "bg-emerald-50" : "bg-blue-50"
                   }`}>
-                    {course.progress === 100
+                    {(progressByCourse.get(course.id) ?? 0) === 100
                       ? <CheckCircle2 size={16} className="text-emerald-500" />
                       : <BookOpen size={16} className="text-blue-600" />
                     }
@@ -160,11 +163,11 @@ export function Profile() {
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex-1 bg-slate-100 rounded-full h-1">
                         <div
-                          className={`h-1 rounded-full ${course.progress === 100 ? "bg-emerald-500" : "bg-blue-500"}`}
-                          style={{ width: `${course.progress}%` }}
+                          className={`h-1 rounded-full ${(progressByCourse.get(course.id) ?? 0) === 100 ? "bg-emerald-500" : "bg-blue-500"}`}
+                          style={{ width: `${(progressByCourse.get(course.id) ?? 0)}%` }}
                         />
                       </div>
-                      <span className="text-xs text-slate-400 font-medium flex-shrink-0">{course.progress}%</span>
+                      <span className="text-xs text-slate-400 font-medium flex-shrink-0">{(progressByCourse.get(course.id) ?? 0)}%</span>
                     </div>
                   </div>
                 </Link>
@@ -189,25 +192,25 @@ export function Profile() {
           <div className="space-y-3">
             {enrolledCourses.map(course => (
               <div key={course.id} className={`flex items-center gap-3 p-3 rounded-xl border ${
-                course.progress === 100 ? "border-emerald-100 bg-emerald-50/50" : "border-gray-100 bg-slate-50"
+                (progressByCourse.get(course.id) ?? 0) === 100 ? "border-emerald-100 bg-emerald-50/50" : "border-gray-100 bg-slate-50"
               }`}>
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  course.progress === 100 ? "bg-emerald-100" : "bg-slate-200"
+                  (progressByCourse.get(course.id) ?? 0) === 100 ? "bg-emerald-100" : "bg-slate-200"
                 }`}>
-                  {course.progress === 100
+                  {(progressByCourse.get(course.id) ?? 0) === 100
                     ? <Award size={16} className="text-emerald-600" />
                     : <Lock size={14} className="text-slate-400" />
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-xs font-semibold truncate ${course.progress === 100 ? "text-slate-900" : "text-slate-400"}`}>
+                  <p className={`text-xs font-semibold truncate ${(progressByCourse.get(course.id) ?? 0) === 100 ? "text-slate-900" : "text-slate-400"}`}>
                     {course.title}
                   </p>
                   <p className="text-xs mt-0.5 text-slate-400">
-                    {course.progress === 100 ? "Certificado disponível" : `${course.progress}% concluído`}
+                    {(progressByCourse.get(course.id) ?? 0) === 100 ? "Certificado disponível" : `${(progressByCourse.get(course.id) ?? 0)}% concluído`}
                   </p>
                 </div>
-                {course.progress === 100 && (
+                {(progressByCourse.get(course.id) ?? 0) === 100 && (
                   <span className="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">Pronto</span>
                 )}
               </div>

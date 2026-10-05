@@ -3,9 +3,10 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import {
   BookOpen, Zap, Target, Award, Play, ArrowRight,
   CheckCircle2, Clock, Flame, TrendingUp, ChevronRight,
-  Code2, BarChart2,
+  Code2, BarChart2, Sparkles,
 } from "lucide-react";
 import { courses, getLessonsByCourseId } from "../data/courses";
+import { getCourseProgress, isLessonComplete, getTotalPoints } from "../lib/progress";
 
 const imageMap: Record<string, string> = {
   "javascript-basics": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?w=600&h=360&fit=crop",
@@ -23,22 +24,30 @@ export function Home() {
     : "Aluno";
 
   const enrolledCourses = courses.filter(c => c.enrolled);
+  // Progresso real, vindo do que o aluno de fato completou (localStorage),
+  // não do valor estático de data/courses.ts.
+  const progressByCourse = new Map(enrolledCourses.map(c => [c.id, getCourseProgress(c.id)]));
   const totalLessons = enrolledCourses.reduce((acc, c) => acc + c.lessons, 0);
   const completedLessons = Math.floor(
-    enrolledCourses.reduce((acc, c) => acc + (c.lessons * c.progress) / 100, 0)
+    enrolledCourses.reduce((acc, c) => acc + (c.lessons * (progressByCourse.get(c.id) ?? 0)) / 100, 0)
   );
   const avgProgress =
     enrolledCourses.length > 0
-      ? Math.round(enrolledCourses.reduce((acc, c) => acc + c.progress, 0) / enrolledCourses.length)
+      ? Math.round(enrolledCourses.reduce((acc, c) => acc + (progressByCourse.get(c.id) ?? 0), 0) / enrolledCourses.length)
       : 0;
+  const totalPoints = getTotalPoints();
 
-  const nextCourse = enrolledCourses.find(c => c.progress < 100 && c.progress > 0) || enrolledCourses[0];
+  const nextCourse = enrolledCourses.find(c => {
+    const p = progressByCourse.get(c.id) ?? 0;
+    return p < 100 && p > 0;
+  }) || enrolledCourses[0];
+  const nextCourseProgress = nextCourse ? (progressByCourse.get(nextCourse.id) ?? 0) : 0;
 
   // Primeira aula não concluída da próxima trilha — usada para levar o
   // aluno direto pra prática, sem passar pela tela de detalhes do curso.
   const nextCourseLessons = nextCourse ? getLessonsByCourseId(nextCourse.id) : [];
-  const nextLesson = nextCourseLessons.find(l => !l.completed) || nextCourseLessons[0];
-  const isNewLearner = nextCourse && nextCourse.progress === 0;
+  const nextLesson = nextCourseLessons.find(l => !isLessonComplete(l.id)) || nextCourseLessons[0];
+  const isNewLearner = nextCourse && nextCourseProgress === 0;
 
   const quickActions = [
     { to: "/app/courses", icon: <BookOpen size={20} />, label: "Cursos", desc: "Ver biblioteca", bg: "bg-blue-50", color: "text-blue-600" },
@@ -75,7 +84,7 @@ export function Home() {
           { icon: <BookOpen size={17} />, color: "text-blue-600", bg: "bg-blue-50", label: "Cursos ativos", value: enrolledCourses.length },
           { icon: <CheckCircle2 size={17} />, color: "text-emerald-600", bg: "bg-emerald-50", label: "Aulas concluídas", value: `${completedLessons}/${totalLessons}` },
           { icon: <TrendingUp size={17} />, color: "text-sky-600", bg: "bg-sky-50", label: "Progresso médio", value: `${avgProgress}%` },
-          { icon: <Flame size={17} />, color: "text-amber-500", bg: "bg-amber-50", label: "Dias seguidos", value: 7 },
+          { icon: <Sparkles size={17} />, color: "text-amber-500", bg: "bg-amber-50", label: "Pontos", value: totalPoints },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-2">
@@ -118,9 +127,9 @@ export function Home() {
                       {isNewLearner ? nextCourse.title : `${nextCourse.lessons} aulas · ${nextCourse.duration}`}
                     </p>
                     <div className="w-full bg-slate-100 rounded-full h-1.5 mb-1">
-                      <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${nextCourse.progress}%` }} />
+                      <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${nextCourseProgress}%` }} />
                     </div>
-                    <span className="text-xs text-slate-400 font-medium">{nextCourse.progress}% concluído</span>
+                    <span className="text-xs text-slate-400 font-medium">{nextCourseProgress}% concluído</span>
                   </div>
                   <div className="mt-3">
                     <span className="inline-flex items-center gap-1.5 bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
@@ -143,28 +152,31 @@ export function Home() {
                 </Link>
               </div>
               <div className="space-y-2">
-                {enrolledCourses.map(course => (
-                  <Link key={course.id} to={`/app/courses/${course.id}`}
-                    className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-200 hover:bg-blue-50/30 transition group">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                      <ImageWithFallback
-                        src={imageMap[course.id]}
-                        alt={course.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-semibold text-slate-900 truncate">{course.title}</span>
-                        <span className="text-xs font-bold text-blue-600 ml-2 flex-shrink-0">{course.progress}%</span>
+                {enrolledCourses.map(course => {
+                  const pct = progressByCourse.get(course.id) ?? 0;
+                  return (
+                    <Link key={course.id} to={`/app/courses/${course.id}`}
+                      className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-200 hover:bg-blue-50/30 transition group">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                        <ImageWithFallback
+                          src={imageMap[course.id]}
+                          alt={course.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <div className="w-full bg-slate-100 rounded-full h-1">
-                        <div className="bg-blue-500 h-1 rounded-full" style={{ width: `${course.progress}%` }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-semibold text-slate-900 truncate">{course.title}</span>
+                          <span className="text-xs font-bold text-blue-600 ml-2 flex-shrink-0">{pct}%</span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-1">
+                          <div className="bg-blue-500 h-1 rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
                       </div>
-                    </div>
-                    <ChevronRight size={14} className="text-slate-300 group-hover:text-blue-500 transition flex-shrink-0" />
-                  </Link>
-                ))}
+                      <ChevronRight size={14} className="text-slate-300 group-hover:text-blue-500 transition flex-shrink-0" />
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -197,20 +209,23 @@ export function Home() {
               <h2 className="text-sm font-extrabold text-slate-900">Progresso geral</h2>
             </div>
             <div className="space-y-3">
-              {enrolledCourses.map(course => (
-                <div key={course.id}>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-semibold text-slate-600 truncate max-w-[140px]">{course.title}</span>
-                    <span className="text-xs font-bold text-slate-900 ml-1">{course.progress}%</span>
+              {enrolledCourses.map(course => {
+                const pct = progressByCourse.get(course.id) ?? 0;
+                return (
+                  <div key={course.id}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-semibold text-slate-600 truncate max-w-[140px]">{course.title}</span>
+                      <span className="text-xs font-bold text-slate-900 ml-1">{pct}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-1.5">
+                      <div
+                        className={`h-1.5 rounded-full ${pct === 100 ? "bg-emerald-500" : "bg-blue-500"}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-1.5">
-                    <div
-                      className={`h-1.5 rounded-full ${course.progress === 100 ? "bg-emerald-500" : "bg-blue-500"}`}
-                      style={{ width: `${course.progress}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
               {enrolledCourses.length === 0 && (
                 <p className="text-xs text-slate-400 text-center py-4">Nenhum curso ainda</p>
               )}
